@@ -6,11 +6,15 @@ mod http;
 use anyhow::{Context, Result};
 use tokio::net::TcpListener;
 use tracing::info;
+use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize tracing subscriber
-    tracing_subscriber::fmt::init();
+    tracing_subscriber::registry()
+        .with(fmt::layer())
+        .with(EnvFilter::from_default_env())
+        .init();
 
     // Load application configuration
     let config = http::config::load()?;
