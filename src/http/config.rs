@@ -1,6 +1,8 @@
 use anyhow::{Context, Result};
 use clap::Parser;
 
+use crate::error_ctx;
+
 #[derive(Debug, Clone, Parser)]
 pub struct Config {
     /// The port to listen on.
@@ -17,11 +19,8 @@ pub struct Config {
 
 #[tracing::instrument]
 pub fn load() -> Result<Config> {
-    let config = Config::try_parse()
-        .with_context(|| {
-            tracing::error!("Failed to parse environment variables");
-            "Failed to parse environment variables"
-        })?;
+    let config =
+        Config::try_parse().with_context(error_ctx!("Failed to parse environment variables"))?;
     tracing::info!("Application configuration loaded");
     tracing::debug!("{:?}", config);
     Ok(config)
