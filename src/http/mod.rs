@@ -25,7 +25,9 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
         .context("Failed to connect to database")?;
 
     // Initialise application state
-    let app_state = AppState { db_pool };
+    let app_state = AppState {
+        db_pool: db_pool.clone(),
+};
 
     // Initialise router
     let router = make_router()
@@ -38,7 +40,10 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     
     axum::serve(listener, router)
         .await
-        .context("Failed to start server")?;
+
+    // Clean up
+    // Close database connection pool
+    db_pool.close().await;
 
     Ok(())
 }
