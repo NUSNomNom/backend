@@ -38,21 +38,21 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     // Initialise application state
     let app_state = AppState {
         db_pool: db_pool.clone(),
-};
+    };
 
     // Initialise router
     let router = make_router()
         .layer(
             TraceLayer::new_for_http()
                 .on_request(DefaultOnRequest::new().level(tracing::Level::INFO))
-                .on_response(DefaultOnResponse::new().level(tracing::Level::INFO))
+                .on_response(DefaultOnResponse::new().level(tracing::Level::INFO)),
         )
         .with_state(app_state);
-    
-// Serve application
+
+    // Serve application
     axum::serve(listener, router)
         .await
-.with_context(error_ctx!("Failed to start server"))?;
+        .with_context(error_ctx!("Failed to start server"))?;
 
     // Clean up
     // Close database connection pool
