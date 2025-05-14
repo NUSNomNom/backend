@@ -6,7 +6,7 @@ mod http;
 use anyhow::{Context, Result};
 use tokio::net::TcpListener;
 use tracing::info;
-use tracing_subscriber::{fmt, prelude::*, EnvFilter};
+use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -22,14 +22,16 @@ async fn main() -> Result<()> {
     // Set up listening socket
     // TODO: Read port from environment variable PORT
     let port = 3000;
-    let addr = format!("0.0.0.0:{}", port);
-    let listener = TcpListener::bind(&addr)
-        .await
-        .with_context(|| format!("Failed to bind to address {}", addr))?;
+    let addr = format!("0.0.0.0:{port}");
+    let listener = TcpListener::bind(&addr).await.with_context(|| {
+        let msg = format!("Failed to bind to address {addr}");
+        tracing::error!(msg);
+        msg
+    })?;
     info!("Listening on port {}", port);
 
     // Delegate startup to server
     http::serve(config, listener)
         .await
-        .with_context(|| format!("Failed to start server on {}", addr))
+        .with_context(|| format!("Failed to start server on {addr}"))
 }
