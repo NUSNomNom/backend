@@ -7,6 +7,17 @@ use sqlx::{AnyPool, any::AnyPoolOptions};
 use tokio::net::TcpListener;
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer};
 
+#[macro_export]
+macro_rules! error_ctx {
+    ($($arg:tt)*) => {
+        || {
+            let msg = format!($($arg)*);
+            tracing::error!(msg);
+            msg
+        }
+    };
+}
+
 #[derive(Clone)]
 struct AppState {
     db_pool: AnyPool,
@@ -22,7 +33,7 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     let db_pool = AnyPoolOptions::new()
         .connect(&config.database_url)
         .await
-        .context("Failed to connect to database")?;
+        .with_context(error_ctx!("Failed to connect to database"))?;
 
     // Initialise application state
     let app_state = AppState {
@@ -38,8 +49,10 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
         )
         .with_state(app_state);
     
+// Serve application
     axum::serve(listener, router)
         .await
+.with_context(error_ctx!("Failed to start server"))?;
 
     // Clean up
     // Close database connection pool
