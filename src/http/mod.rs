@@ -1,4 +1,5 @@
 pub mod config;
+mod v1;
 
 use anyhow::{Context, Result};
 use axum::Router;
@@ -24,7 +25,7 @@ struct AppState {
 }
 
 fn make_router() -> Router<AppState> {
-    Router::new()
+    Router::new().nest("/v1", v1::make_router())
 }
 
 #[tracing::instrument]
@@ -41,7 +42,8 @@ pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     };
 
     // Initialise router
-    let router = make_router()
+    let router = Router::new()
+        .nest("/api", make_router())
         .layer(
             TraceLayer::new_for_http()
                 .on_request(DefaultOnRequest::new().level(tracing::Level::INFO))
