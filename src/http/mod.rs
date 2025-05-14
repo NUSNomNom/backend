@@ -3,13 +3,13 @@ pub mod config;
 use anyhow::{Context, Result};
 use axum::Router;
 use config::Config;
-use sqlx::{mysql::MySqlPoolOptions, MySqlPool};
+use sqlx::{AnyPool, any::AnyPoolOptions};
 use tokio::net::TcpListener;
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer};
 
 #[derive(Clone)]
 struct AppState {
-    db_pool: MySqlPool,
+    db_pool: AnyPool,
 }
 
 fn make_router() -> Router<AppState> {
@@ -19,7 +19,7 @@ fn make_router() -> Router<AppState> {
 #[tracing::instrument]
 pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     // Initialise database connection pool
-    let db_pool = MySqlPoolOptions::new()
+    let db_pool = AnyPoolOptions::new()
         .connect(&config.database_url)
         .await
         .context("Failed to connect to database")?;
