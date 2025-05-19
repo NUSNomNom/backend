@@ -24,41 +24,48 @@ struct AppState {
     db_pool: AnyPool,
 }
 
-fn make_router() -> Router<AppState> {
-    Router::new().nest("/v1", v1::make_router())
+impl AppState {
+    async fn from_config(config: &Config) -> Result<AppState> {
+        // Initialise database connection pool
+        let db_pool = AnyPoolOptions::new()
+            .connect(&config.database_url)
+            .await
+            .with_context(error_ctx!("Failed to connect to database"))?;
+        Ok(Self { db_pool })
+    }
 }
 
-#[tracing::instrument]
-pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
-    // Initialise database connection pool
-    let db_pool = AnyPoolOptions::new()
-        .connect(&config.database_url)
-        .await
-        .with_context(error_ctx!("Failed to connect to database"))?;
-
+async fn make_app(config: &Config) -> Result<Router<()>> {
     // Initialise application state
-    let app_state = AppState {
-        db_pool: db_pool.clone(),
-    };
+    let state = AppState::from_config(config)
+        .await
+        .with_context(error_ctx!("Failed to create application state"))?;
 
-    // Initialise router
+    // Double nesting here to allow for v2
+    let router = Router::new().nest("/v1", v1::make_router());
     let router = Router::new()
-        .nest("/api", make_router())
+        .nest("/api", router)
         .layer(
             TraceLayer::new_for_http()
                 .on_request(DefaultOnRequest::new().level(tracing::Level::INFO))
                 .on_response(DefaultOnResponse::new().level(tracing::Level::INFO)),
         )
-        .with_state(app_state);
+        .with_state(state);
+
+    Ok(router)
+}
+
+#[tracing::instrument]
+pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
+    // Create application
+    let app = make_app(&config)
+        .await
+        .with_context(error_ctx!("Failed to create application"))?;
 
     // Serve application
-    axum::serve(listener, router)
+    axum::serve(listener, app)
         .await
         .with_context(error_ctx!("Failed to start server"))?;
-
-    // Clean up
-    // Close database connection pool
-    db_pool.close().await;
 
     Ok(())
 }
