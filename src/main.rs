@@ -1,12 +1,19 @@
 #![forbid(unsafe_code)]
 #![warn(clippy::correctness, clippy::pedantic, clippy::style, clippy::perf)]
 
-mod http;
+mod app;
+mod config;
+mod macros;
+mod routes;
+mod state;
 
 use anyhow::{Context, Result};
 use tokio::net::TcpListener;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
+
+pub use config::Config;
+pub use state::{AppState, DefaultState};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -17,7 +24,7 @@ async fn main() -> Result<()> {
         .init();
 
     // Load application configuration
-    let config = http::config::load()?;
+    let config = config::load()?;
 
     // Set up listening socket
     // TODO: Read port from environment variable PORT
@@ -31,7 +38,7 @@ async fn main() -> Result<()> {
     info!("Listening on port {}", port);
 
     // Delegate startup to server
-    http::serve(config, listener)
+    app::serve(config, listener)
         .await
         .with_context(|| format!("Failed to start server on {addr}"))
 }
