@@ -55,4 +55,4 @@ jobs:
         run: cargo clippy --quiet --locked --all-targets --all-features -- -D warnings
       
       - name: Run tests
-        run: cargo test --quiet --locked --release --all-targets --all-features
+        run: cargo test --quiet --locked --all-targets --all-features
