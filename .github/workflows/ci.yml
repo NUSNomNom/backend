@@ -1,0 +1,53 @@
+name: Rust CI
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    paths:
+      - '**/*.rs'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  push:
+      branches:
+        - feature/*
+        - fix/*
+      paths:
+        - '**/*.rs'
+        - 'Cargo.toml'
+        - 'Cargo.lock'
+jobs:
+  rust-ci:
+    name: Rust Format, Lint, and Test (Stable)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1.0.6
+        with:
+          toolchain: stable
+          components: rustfmt, clippy
+          override: true
+      
+      - name: Cache Cargo registry
+        uses: actions/cache@v4.2.3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Build project
+        run: cargo build --quiet --locked --release
+
+      - name: Check formatting
+        run: cargo fmt --quiet --check
+
+      - name: Check linting
+        run: cargo clippy --quiet --locked --all-targets --all-features -- -D warnings
