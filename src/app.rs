@@ -16,9 +16,7 @@ async fn make_app(config: &Config) -> Result<Router<()>> {
         .with_context(error_ctx!("Failed to create application state"))?;
 
     // Double nesting here to allow for v2
-    let router = Router::new().nest("/v1", routes::make_router());
-    let router = Router::new()
-        .nest("/api", router)
+    let router = routes::make_router()
         .layer(
             TraceLayer::new_for_http()
                 .on_request(DefaultOnRequest::new().level(tracing::Level::INFO))
