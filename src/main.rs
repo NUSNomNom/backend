@@ -24,15 +24,13 @@ async fn main() -> Result<()> {
     let config = config::load()?;
 
     // Set up listening socket
-    // TODO: Read port from environment variable PORT
-    let port = 3000;
-    let addr = format!("0.0.0.0:{port}");
+    let addr = format!("0.0.0.0:{}", config.port);
     let listener = TcpListener::bind(&addr).await.with_context(|| {
         let msg = format!("Failed to bind to address {addr}");
         tracing::error!(msg);
         msg
     })?;
-    info!("Listening on port {}", port);
+    info!("Listening on port {}", config.port);
 
     // Delegate startup to server
     app::serve(config, listener)
