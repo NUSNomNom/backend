@@ -37,7 +37,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Build project
-        run: cargo build --quiet --locked --release
+        run: cargo build --quiet --locked
 
       - name: Check formatting
         run: cargo fmt --quiet --check
