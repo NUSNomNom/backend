@@ -1,10 +1,10 @@
 use axum::{routing::{get, post, put}, Router};
 
-use crate::AppState;
+use crate::state::AppState;
 
 mod v1;
 
-pub fn make_router<S: AppState>() -> Router<S> {
+pub(crate) fn make_router<S: AppState>() -> Router<S> {
     Router::new()
         .route("/api/v1/user", post(v1::user::create::<S>))
         .route("/api/v1/user", get(v1::user::fetch::<S>))
