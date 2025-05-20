@@ -12,9 +12,6 @@ use tokio::net::TcpListener;
 use tracing::info;
 use tracing_subscriber::{EnvFilter, fmt, prelude::*};
 
-pub use config::Config;
-pub use state::{AppState, DefaultState};
-
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize tracing subscriber
