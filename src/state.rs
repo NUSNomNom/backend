@@ -1,15 +1,19 @@
 use anyhow::{Context, Result};
 use sqlx::{any::AnyPoolOptions, AnyPool};
 
-use crate::{Config, error_ctx};
+use crate::{config::Config, error_ctx};
 
-pub trait AppState: Clone + Send + Sync + 'static {
+/// Trait for application state.
+/// 
+/// This allows for mock implementations of the state for testing purposes.
+// #[allow(async_fn_in_trait)]
+pub(crate) trait AppState: Clone + Send + Sync + 'static {
     async fn from_config(config: &Config) -> Result<Self> where Self: Sized;
     async fn db(&self) -> &AnyPool;
 }
 
 #[derive(Clone)]
-pub struct DefaultState {
+pub(crate) struct DefaultState {
     db_pool: AnyPool,
 }
 

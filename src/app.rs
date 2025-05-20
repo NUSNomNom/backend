@@ -3,7 +3,7 @@ use axum::Router;
 use tokio::net::TcpListener;
 use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer};
 
-use crate::*;
+use crate::{error_ctx, routes, state::{AppState, DefaultState}, config::Config};
 
 async fn make_app(config: &Config) -> Result<Router<()>> {
     // Initialise application state
@@ -26,7 +26,7 @@ async fn make_app(config: &Config) -> Result<Router<()>> {
 }
 
 #[tracing::instrument]
-pub async fn serve(config: Config, listener: TcpListener) -> Result<()> {
+pub(crate) async fn serve(config: Config, listener: TcpListener) -> Result<()> {
     // Create application
     let app = make_app(&config)
         .await
