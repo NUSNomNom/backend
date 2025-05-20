@@ -8,16 +8,7 @@ on:
       - '**/*.rs'
       - 'Cargo.toml'
       - 'Cargo.lock'
-  push:
-      branches:
-        - main
-        - dev
-        - feature/*
-        - fix/*
-      paths:
-        - '**/*.rs'
-        - 'Cargo.toml'
-        - 'Cargo.lock'
+
 jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
