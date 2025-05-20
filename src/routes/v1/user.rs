@@ -1,7 +1,4 @@
-use axum::{
-    extract::State,
-    response::IntoResponse,
-};
+use axum::{extract::State, response::IntoResponse};
 
 use crate::state::AppState;
 

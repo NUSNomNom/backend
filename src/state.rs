@@ -1,33 +1,35 @@
-use anyhow::{Context, Result};
-use sqlx::{any::AnyPoolOptions, AnyPool};
+use anyhow::Result;
 
-use crate::{config::Config, error_ctx};
+use crate::config::Config;
 
 /// Trait for application state.
-/// 
+///
 /// This allows for mock implementations of the state for testing purposes.
 // #[allow(async_fn_in_trait)]
 pub(crate) trait AppState: Clone + Send + Sync + 'static {
-    async fn from_config(config: &Config) -> Result<Self> where Self: Sized;
-    async fn db(&self) -> &AnyPool;
+    async fn from_config(config: &Config) -> Result<Self>
+    where
+        Self: Sized;
+    // async fn db(&self) -> &AnyPool;
 }
 
 #[derive(Clone)]
 pub(crate) struct DefaultState {
-    db_pool: AnyPool,
+    // db_pool: AnyPool,
 }
 
 impl AppState for DefaultState {
-    async fn from_config(config: &Config) -> Result<Self> {
+    async fn from_config(_: &Config) -> Result<Self> {
         // Initialise database connection pool
-        let db_pool = AnyPoolOptions::new()
-            .connect(&config.database_url)
-            .await
-            .with_context(error_ctx!("Failed to connect to database"))?;
-        Ok(Self { db_pool })
+        // let db_pool = AnyPoolOptions::new()
+        //     .connect(&config.database_url)
+        //     .await
+        //     .with_context(error_ctx!("Failed to connect to database"))?;
+        // Ok(Self { db_pool })
+        Ok(Self {})
     }
 
-    async fn db(&self) -> &AnyPool {
-        &self.db_pool
-    }
+    // async fn db(&self) -> &AnyPool {
+    //     &self.db_pool
+    // }
 }
