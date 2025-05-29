@@ -46,12 +46,4 @@ impl NomerClaim {
             acc: is_access,
         }
     }
-
-    pub fn is_access_token(&self) -> bool {
-        self.acc
-    }
-
-    pub fn is_refresh_token(&self) -> bool{
-        !self.acc
-    }
 }
