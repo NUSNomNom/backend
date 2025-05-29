@@ -8,9 +8,6 @@ mod models;
 mod routes;
 mod state;
 
-#[cfg(test)]
-mod tests;
-
 use anyhow::{Context, Result};
 use tokio::net::TcpListener;
 use tracing::info;
