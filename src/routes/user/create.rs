@@ -14,7 +14,7 @@ pub(super) async fn handle(
     State(state): State<AppState>,
     Json(body): Json<CreateRequest>,
 ) -> impl IntoResponse {
-    match create_user(body, state.db()).await {
+    match create_user(&body, state.db()).await {
         Ok(msg) => (StatusCode::OK, msg).into_response(),
         Err(err) => err.into_response(),
     }
@@ -27,7 +27,7 @@ pub(super) struct CreateRequest {
     password: String,
 }
 
-async fn create_user(body: CreateRequest, db: &SqlitePool) -> Result<String, impl IntoResponse> {
+async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, impl IntoResponse> {
     // Validate input
     if validate_display_name(&body.display_name)
         || validate_email(&body.email)
