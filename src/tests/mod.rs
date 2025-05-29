@@ -21,7 +21,7 @@ impl AppState for TestState {
         Ok(Self { db_pool })
     }
 
-    async fn db(&self) -> &SqlitePool {
+    fn db(&self) -> &SqlitePool {
         &self.db_pool
     }
 }
