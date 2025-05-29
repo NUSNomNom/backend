@@ -52,3 +52,24 @@ fn refresh(hmac: &Hmac<Sha256>, refresh_token: &str) -> Result<String, (StatusCo
         )),
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use hmac::Mac;
+
+    #[test]
+    fn test_refresh() {
+        let hmac = Hmac::<Sha256>::new_from_slice(b"secret").unwrap();
+        let claim = NomerClaim::make("test_user".to_string(), 60, false);
+        let refresh_token = claim.sign_with_key(&hmac).unwrap();
+
+        let result = refresh(&hmac, &refresh_token);
+        assert!(result.is_ok());
+
+        let access_token = result.unwrap();
+        let verified_claim: NomerClaim = access_token.verify_with_key(&hmac).unwrap();
+        assert_eq!(verified_claim.sub, "test_user");
+        assert!(verified_claim.acc);
+    }
+}
