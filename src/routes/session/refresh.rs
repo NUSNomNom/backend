@@ -1,6 +1,8 @@
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use hmac::Hmac;
 use jwt::{SignWithKey, VerifyWithKey};
 use serde::{Deserialize, Serialize};
+use sha2::Sha256;
 
 use crate::{models::NomerClaim, state::AppState};
 
@@ -8,7 +10,7 @@ pub(super) async fn handle(
     State(state): State<AppState>,
     Json(body): Json<RefreshRequest>,
 ) -> impl IntoResponse {
-    match refresh(&state, &body.refresh_token) {
+    match refresh(state.hmac(), &body.refresh_token) {
         Ok(access_token) => {
             let response = RefreshResponse { access_token };
             (StatusCode::OK, Json(response)).into_response()
@@ -27,9 +29,9 @@ pub(super) struct RefreshResponse {
     access_token: String,
 }
 
-fn refresh(state: &AppState, refresh_token: &str) -> Result<String, (StatusCode, &'static str)> {
+fn refresh(hmac: &Hmac<Sha256>, refresh_token: &str) -> Result<String, (StatusCode, &'static str)> {
     // Validate the refresh token
-    let claim: NomerClaim = match refresh_token.verify_with_key(state.hmac()) {
+    let claim: NomerClaim = match refresh_token.verify_with_key(hmac) {
         Ok(claims) => claims,
         Err(_) => return Err((StatusCode::UNAUTHORIZED, "Invalid refresh token")),
     };
@@ -42,7 +44,7 @@ fn refresh(state: &AppState, refresh_token: &str) -> Result<String, (StatusCode,
     // Generate a new access token
     let token = NomerClaim::make(claim.sub, 60 * 60, true);
 
-    match token.sign_with_key(state.hmac()) {
+    match token.sign_with_key(hmac) {
         Ok(access_token) => Ok(access_token),
         Err(_) => Err((
             StatusCode::INTERNAL_SERVER_ERROR,
