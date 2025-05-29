@@ -16,32 +16,42 @@ pub struct Nomer {
 
 impl Nomer {
     pub fn make_access_token(&self, key: &Hmac<Sha256>) -> Option<String> {
-        Claim::make(self.email.clone(), 60 * 60)
+        NomerClaim::make(self.email.clone(), 60 * 60, true)
             .sign_with_key(key)
             .ok()
     }
 
     pub fn make_refresh_token(&self, key: &Hmac<Sha256>) -> Option<String> {
-        Claim::make(self.email.clone(), 60 * 60 * 24 * 30)
+        NomerClaim::make(self.email.clone(), 60 * 60 * 24 * 30, false)
             .sign_with_key(key)
             .ok()
     }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-struct Claim {
+pub struct NomerClaim {
     sub: String,
     exp: i64,
     iat: i64,
+    acc: bool,
 }
 
-impl Claim {
-    fn make(subject: String, duration: i64) -> Self {
+impl NomerClaim {
+    fn make(subject: String, duration: i64, is_access: bool) -> Self {
         let now = Utc::now().timestamp();
-        Claim {
+        NomerClaim {
             sub: subject,
             exp: now + duration,
             iat: now,
+            acc: is_access,
         }
+    }
+
+    pub fn is_access_token(&self) -> bool {
+        self.acc
+    }
+
+    pub fn is_refresh_token(&self) -> bool{
+        !self.acc
     }
 }
