@@ -52,9 +52,9 @@ async fn login(
         Some(false) => return Err((StatusCode::UNAUTHORIZED, "Invalid email or password")),
         None => {
             return Err((
-                            StatusCode::INTERNAL_SERVER_ERROR,
-                            "Password verification failed",
-                        ));
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Password verification failed",
+            ));
         }
     }
 
@@ -62,18 +62,18 @@ async fn login(
     let access_token = match nomer.make_access_token(&state.hmac()) {
         Some(token) => token,
         None => {
-return Err((
-StatusCode::INTERNAL_SERVER_ERROR,
-"Failed to create access token",
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create access token",
             ));
         }
     };
     let refresh_token = match nomer.make_refresh_token(&state.hmac()) {
         Some(token) => token,
         None => {
-return Err((
-StatusCode::INTERNAL_SERVER_ERROR,
-"Failed to create refresh token",
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to create refresh token",
             ));
         }
     };
@@ -121,4 +121,68 @@ fn verify_password(password: &str, hash: &str) -> Option<bool> {
             .verify_password(password.as_bytes(), &parsed_hash)
             .is_ok(),
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use argon2::{
+        PasswordHasher,
+        password_hash::{SaltString, rand_core::OsRng},
+    };
+
+    #[test]
+    fn test_verify_password() {
+        let password = "test_password";
+        let salt = SaltString::generate(OsRng);
+        let hash = Argon2::default()
+            .hash_password(password.as_bytes(), &salt)
+            .unwrap()
+            .to_string();
+
+        assert_eq!(verify_password(password, &hash), Some(true));
+
+        let wrong_password = "wrong_password";
+        assert_eq!(verify_password(wrong_password, &hash), Some(false));
+
+        let invalid_hash = "invalid_hash_format";
+        assert_eq!(verify_password(password, invalid_hash), None);
+    }
+
+    #[tokio::test]
+    async fn test_get_nomer_by_email() {
+        let db = SqlitePool::connect("sqlite::memory:").await.unwrap();
+        sqlx::migrate!().run(&db).await.unwrap();
+        sqlx::query!(
+            r#"INSERT INTO Nomer (
+                DisplayName,
+                Email,
+                PasswordHash
+            ) VALUES (
+                "Test",
+                "test@test.com",
+                "test_hash"
+            )"#
+        )
+        .execute(&db)
+        .await
+        .unwrap();
+
+        let nomer = get_nomer_by_email(&db, "test@test.com").await;
+
+        assert!(nomer.is_ok());
+
+        let nomer = nomer.unwrap();
+
+        assert!(nomer.is_some());
+        assert_eq!(nomer.unwrap().display_name, "Test");
+
+        let nomer = get_nomer_by_email(&db, "wrong@email.com").await;
+
+        assert!(nomer.is_ok());
+
+        let nomer = nomer.unwrap();
+
+        assert!(nomer.is_none());
+    }
 }
