@@ -8,8 +8,8 @@ use axum::{
 
 use crate::state::AppState;
 
-pub(super) fn make_router<S: AppState>() -> Router<S> {
+pub(super) fn make_router() -> Router<AppState> {
     Router::new()
-        .route("/", post(create::handle::<S>))
-        .route("/", get(fetch::handle::<S>))
+        .route("/", post(create::handle))
+        .route("/", get(fetch::handle))
 }

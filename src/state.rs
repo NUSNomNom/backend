@@ -5,25 +5,14 @@ use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 use crate::{config::Config, error_ctx};
 
-/// Trait for application state.
-///
-/// This allows for mock implementations of the state for testing purposes.
-pub(crate) trait AppState: Clone + Send + Sync + 'static {
-    async fn from_config(config: &Config) -> Result<Self>
-    where
-        Self: Sized;
-    fn db(&self) -> &SqlitePool;
-    fn hmac(&self) -> &Hmac<Sha256>;
-}
-
 #[derive(Clone)]
-pub(crate) struct DefaultState {
+pub(crate) struct AppState {
     db_pool: SqlitePool,
     hmac: Hmac<Sha256>,
 }
 
-impl AppState for DefaultState {
-    async fn from_config(config: &Config) -> Result<Self> {
+impl AppState {
+    pub async fn from_config(config: &Config) -> Result<Self> {
         // Initialise database connection pool
         let db_pool = SqlitePoolOptions::new()
             .connect(&config.database_url)
@@ -36,11 +25,11 @@ impl AppState for DefaultState {
         Ok(Self { db_pool, hmac })
     }
 
-    fn db(&self) -> &SqlitePool {
+    pub fn db(&self) -> &SqlitePool {
         &self.db_pool
     }
 
-    fn hmac(&self) -> &Hmac<Sha256> {
+    pub fn hmac(&self) -> &Hmac<Sha256> {
         &self.hmac
     }
 }
