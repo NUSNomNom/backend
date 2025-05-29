@@ -6,12 +6,12 @@ use tower_http::trace::{DefaultOnRequest, DefaultOnResponse, TraceLayer};
 use crate::{
     config::Config,
     error_ctx, routes,
-    state::{AppState, DefaultState},
+    state::AppState,
 };
 
 async fn make_app(config: &Config) -> Result<Router<()>> {
     // Initialise application state
-    let state = DefaultState::from_config(config)
+    let state = AppState::from_config(config)
         .await
         .with_context(error_ctx!("Failed to create application state"))?;
 

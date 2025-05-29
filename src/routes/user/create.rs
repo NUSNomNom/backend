@@ -10,8 +10,8 @@ use tracing::error;
 
 use crate::state::AppState;
 
-pub(super) async fn handle<S: AppState>(
-    State(state): State<S>,
+pub(super) async fn handle(
+    State(state): State<AppState>,
     Json(body): Json<CreateRequest>,
 ) -> impl IntoResponse {
     match create_user(body, state.db()).await {
