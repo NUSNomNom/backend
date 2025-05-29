@@ -1,5 +1,8 @@
-use argon2::{password_hash::{rand_core::OsRng, SaltString, PasswordHasher}, Argon2};
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHasher, SaltString, rand_core::OsRng},
+};
+use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use email_address::EmailAddress;
 use serde::Deserialize;
 use sqlx::SqlitePool;
@@ -93,5 +96,6 @@ fn hash_password(password: &str) -> Option<String> {
     let hasher = Argon2::default();
     hasher
         .hash_password(password.as_bytes(), &salt)
-        .map(|hash| hash.to_string()).ok()
-} 
+        .map(|hash| hash.to_string())
+        .ok()
+}
