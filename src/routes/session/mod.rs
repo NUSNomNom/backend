@@ -1,6 +1,5 @@
 use axum::{
-    Router,
-    routing::{get, post},
+    routing::{post, put}, Router
 };
 
 use crate::state::AppState;
@@ -11,5 +10,5 @@ mod refresh;
 pub(super) fn make_router() -> Router<AppState> {
     Router::new()
         .route("/", post(login::handle))
-        .route("/", get(refresh::handle))
+        .route("/", put(refresh::handle))
 }
