@@ -15,6 +15,11 @@ pub(crate) struct Config {
     /// If not set, defaults to 3000.
     #[arg(env = "PORT", default_value_t = 3000)]
     pub(super) port: u16,
+
+    /// The Base64-encoded secret key used for HMAC.
+    /// Set by the `HMAC_SECRET` environment variable.
+    #[arg(env = "HMAC_SECRET", required = true)]
+    pub(super) hmac_secret: String,
 }
 
 #[tracing::instrument]
