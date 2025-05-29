@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use sqlx::{any::AnyPoolOptions, AnyPool};
+use sqlx::{AnyPool, any::AnyPoolOptions};
 
 use crate::{config::Config, error_ctx};
 
