@@ -1,11 +1,14 @@
-mod fetch;
 mod create;
+mod fetch;
 
-use axum::{routing::{get, post}, Router};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 
 use crate::state::AppState;
 
-pub(super) fn make_router<S: AppState>() -> axum::Router<S> {
+pub(super) fn make_router<S: AppState>() -> Router<S> {
     Router::new()
         .route("/", post(create::handle::<S>))
         .route("/", get(fetch::handle::<S>))
