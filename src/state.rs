@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use sqlx::{AnyPool, any::AnyPoolOptions};
+use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
 
 use crate::{config::Config, error_ctx};
 
@@ -10,25 +10,25 @@ pub(crate) trait AppState: Clone + Send + Sync + 'static {
     async fn from_config(config: &Config) -> Result<Self>
     where
         Self: Sized;
-    async fn db(&self) -> &AnyPool;
+    async fn db(&self) -> &SqlitePool;
 }
 
 #[derive(Clone)]
 pub(crate) struct DefaultState {
-    db_pool: AnyPool,
+    db_pool: SqlitePool,
 }
 
 impl AppState for DefaultState {
     async fn from_config(config: &Config) -> Result<Self> {
         // Initialise database connection pool
-        let db_pool = AnyPoolOptions::new()
+        let db_pool = SqlitePoolOptions::new()
             .connect(&config.database_url)
             .await
             .with_context(error_ctx!("Failed to connect to database"))?;
         Ok(Self { db_pool })
     }
 
-    async fn db(&self) -> &AnyPool {
+    async fn db(&self) -> &SqlitePool {
         &self.db_pool
     }
 }
