@@ -27,6 +27,27 @@ pub(super) struct CreateRequest {
     password: String,
 }
 
+fn validate_display_name(display_name: &str) -> bool {
+    display_name.is_empty() || display_name.len() > 50
+}
+
+fn validate_email(email: &str) -> bool {
+    !EmailAddress::is_valid(email)
+}
+
+fn validate_password(password: &str) -> bool {
+    password.is_empty() || password.len() < 8 || password.len() > 100
+}
+
+fn hash_password(password: &str) -> Option<String> {
+    let salt = SaltString::generate(&mut OsRng);
+    let hasher = Argon2::default();
+    hasher
+        .hash_password(password.as_bytes(), &salt)
+        .map(|hash| hash.to_string())
+        .ok()
+}
+
 async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, impl IntoResponse> {
     // Validate input
     if validate_display_name(&body.display_name)
@@ -79,23 +100,72 @@ async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, im
     }
 }
 
-fn validate_display_name(display_name: &str) -> bool {
-    display_name.is_empty() || display_name.len() > 50
-}
 
-fn validate_email(email: &str) -> bool {
-    !EmailAddress::is_valid(email)
-}
+#[cfg(test)]
+mod tests {
+    use argon2::{PasswordHash, PasswordVerifier};
 
-fn validate_password(password: &str) -> bool {
-    password.is_empty() || password.len() < 8 || password.len() > 100
-}
+    use super::*;
 
-fn hash_password(password: &str) -> Option<String> {
-    let salt = SaltString::generate(&mut OsRng);
-    let hasher = Argon2::default();
-    hasher
-        .hash_password(password.as_bytes(), &salt)
-        .map(|hash| hash.to_string())
-        .ok()
+    #[test]
+    fn test_validate_display_name() {
+        assert!(validate_display_name(""));
+        assert!(validate_display_name("thisisaverylongdisplaynamewhichshouldnotbevalidHAHAHAHHAHAHA"));
+        assert!(!validate_display_name("validname"));
+    }
+
+    #[test]
+    fn test_validate_email() {
+        assert!(validate_email(""));
+        assert!(validate_email("invalid-email"));
+        assert!(!validate_email("hello@abc.com"));
+        assert!(!validate_email("hello+tag@abc.com"));
+    }
+
+    #[test]
+    fn test_validate_password() {
+        assert!(validate_password("short"));
+        assert!(validate_password(""));
+        assert!(!validate_password("validpassword"));
+        assert!(!validate_password("thisisaverylongpasswordthatshouldbevalid"));
+    }
+    
+    #[test]
+    fn test_hash_password() {
+        let password = "test_password";
+        let hashed = hash_password(password);
+        let hashed_2 = hash_password(password);
+
+        assert!(hashed.is_some());
+        assert!(hashed_2.is_some());
+        assert_ne!(hashed, hashed_2);
+
+        let hmac = Argon2::default();
+        let hashed_str = hashed.unwrap();
+        let hashed = PasswordHash::new(&hashed_str);
+
+        assert!(hashed.is_ok());
+
+        let hashed = hashed.unwrap();
+        assert!(hmac.verify_password(password.as_bytes(), &hashed).is_ok());
+    }
+
+    #[tokio::test]
+    async fn test_create_user() {
+        let db = SqlitePool::connect_lazy("sqlite::memory:").unwrap();
+        sqlx::migrate!().run(&db).await.unwrap();
+        
+        let request = CreateRequest {
+            display_name: "test_user".to_string(),
+            password: "test_password".to_string(),
+            email: "test@test.com".to_string(),
+        };
+        let result = create_user(&request, &db).await;
+
+        assert!(result.is_ok());
+
+        let existed = create_user(&request, &db).await;
+
+        assert!(existed.is_err());
+    }
 }
