@@ -9,7 +9,7 @@ use crate::state::AppState;
 
 pub(super) async fn handle<S: AppState>(
     State(state): State<S>,
-    Json(body): Json<CreateBody>,
+    Json(body): Json<CreateRequest>,
 ) -> impl IntoResponse {
     match create_user(body, state.db()).await {
         Ok(msg) => (StatusCode::OK, msg).into_response(),
@@ -18,13 +18,13 @@ pub(super) async fn handle<S: AppState>(
 }
 
 #[derive(Debug, Deserialize)]
-pub(super) struct CreateBody {
+pub(super) struct CreateRequest {
     display_name: String,
     email: String,
     password: String,
 }
 
-async fn create_user(body: CreateBody, db: &SqlitePool) -> Result<String, impl IntoResponse> {
+async fn create_user(body: CreateRequest, db: &SqlitePool) -> Result<String, impl IntoResponse> {
     // Validate input
     if validate_display_name(&body.display_name)
         || validate_email(&body.email)
