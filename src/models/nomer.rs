@@ -30,14 +30,14 @@ impl Nomer {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NomerClaim {
-    sub: String,
-    exp: i64,
-    iat: i64,
-    acc: bool,
+    pub sub: String,
+    pub exp: i64,
+    pub iat: i64,
+    pub acc: bool,
 }
 
 impl NomerClaim {
-    fn make(subject: String, duration: i64, is_access: bool) -> Self {
+    pub fn make(subject: String, duration: i64, is_access: bool) -> Self {
         let now = Utc::now().timestamp();
         NomerClaim {
             sub: subject,
