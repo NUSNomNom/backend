@@ -8,7 +8,7 @@ pub(super) async fn handle(
     State(state): State<AppState>,
     Json(body): Json<RefreshRequest>,
 ) -> impl IntoResponse {
-    match refresh(&state, &body.refresh_token).await {
+    match refresh(&state, &body.refresh_token) {
         Ok(access_token) => {
             let response = RefreshResponse { access_token };
             (StatusCode::OK, Json(response)).into_response()
@@ -27,10 +27,7 @@ pub(super) struct RefreshResponse {
     access_token: String,
 }
 
-async fn refresh(
-    state: &AppState,
-    refresh_token: &str,
-) -> Result<String, (StatusCode, &'static str)> {
+fn refresh(state: &AppState, refresh_token: &str) -> Result<String, (StatusCode, &'static str)> {
     // Validate the refresh token
     let claim: NomerClaim = match refresh_token.verify_with_key(state.hmac()) {
         Ok(claims) => claims,
