@@ -100,7 +100,6 @@ async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, im
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use argon2::{PasswordHash, PasswordVerifier};
@@ -110,7 +109,9 @@ mod tests {
     #[test]
     fn test_validate_display_name() {
         assert!(validate_display_name(""));
-        assert!(validate_display_name("thisisaverylongdisplaynamewhichshouldnotbevalidHAHAHAHHAHAHA"));
+        assert!(validate_display_name(
+            "thisisaverylongdisplaynamewhichshouldnotbevalidHAHAHAHHAHAHA"
+        ));
         assert!(!validate_display_name("validname"));
     }
 
@@ -127,9 +128,11 @@ mod tests {
         assert!(validate_password("short"));
         assert!(validate_password(""));
         assert!(!validate_password("validpassword"));
-        assert!(!validate_password("thisisaverylongpasswordthatshouldbevalid"));
+        assert!(!validate_password(
+            "thisisaverylongpasswordthatshouldbevalid"
+        ));
     }
-    
+
     #[test]
     fn test_hash_password() {
         let password = "test_password";
@@ -154,7 +157,7 @@ mod tests {
     async fn test_create_user() {
         let db = SqlitePool::connect_lazy("sqlite::memory:").unwrap();
         sqlx::migrate!().run(&db).await.unwrap();
-        
+
         let request = CreateRequest {
             display_name: "test_user".to_string(),
             password: "test_password".to_string(),
