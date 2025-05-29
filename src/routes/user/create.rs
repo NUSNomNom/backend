@@ -1,16 +1,5 @@
-use core::str;
-
-use argon2::{
-    password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
-    Argon2,
-};
-use axum::{
-    Json, Router,
-    extract::State,
-    http::StatusCode,
-    response::IntoResponse,
-    routing::{get, post, put},
-};
+use argon2::{password_hash::{rand_core::OsRng, SaltString, PasswordHasher}, Argon2};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use email_address::EmailAddress;
 use serde::Deserialize;
 use sqlx::SqlitePool;
@@ -18,15 +7,7 @@ use tracing::error;
 
 use crate::state::AppState;
 
-pub(super) fn make_router<S: AppState>() -> axum::Router<S> {
-    Router::new()
-        .route("/", post(create::<S>))
-        .route("/", get(fetch::<S>))
-        .route("/password", put(update_password::<S>))
-        .route("/recovery", post(request_reset::<S>))
-}
-
-async fn create<S: AppState>(
+pub(super) async fn handle<S: AppState>(
     State(state): State<S>,
     Json(body): Json<CreateBody>,
 ) -> impl IntoResponse {
@@ -36,14 +17,8 @@ async fn create<S: AppState>(
     }
 }
 
-async fn fetch<S: AppState>(State(_): State<S>) -> impl IntoResponse {}
-
-async fn update_password<S: AppState>(State(_): State<S>) -> impl IntoResponse {}
-
-async fn request_reset<S: AppState>(State(_): State<S>) -> impl IntoResponse {}
-
 #[derive(Debug, Deserialize)]
-struct CreateBody {
+pub(super) struct CreateBody {
     display_name: String,
     email: String,
     password: String,
