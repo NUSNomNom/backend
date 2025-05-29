@@ -7,10 +7,8 @@ mod create {
 
     #[tokio::test]
     async fn new_user() -> Result<()> {
-        let app = make_test_app()
-            .await
-            .expect("Failed to create test app");
-        
+        let app = make_test_app().await.expect("Failed to create test app");
+
         Ok(())
     }
 }
