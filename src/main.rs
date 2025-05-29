@@ -4,6 +4,7 @@
 mod app;
 mod config;
 mod macros;
+mod models;
 mod routes;
 mod state;
 
