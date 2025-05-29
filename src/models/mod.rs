@@ -1,3 +1,3 @@
 mod nomer;
 
-pub use nomer::Nomer;
+pub use nomer::{Nomer, NomerClaim};
