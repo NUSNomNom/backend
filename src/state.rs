@@ -10,7 +10,7 @@ pub(crate) trait AppState: Clone + Send + Sync + 'static {
     async fn from_config(config: &Config) -> Result<Self>
     where
         Self: Sized;
-    async fn db(&self) -> &SqlitePool;
+    fn db(&self) -> &SqlitePool;
 }
 
 #[derive(Clone)]
@@ -28,7 +28,7 @@ impl AppState for DefaultState {
         Ok(Self { db_pool })
     }
 
-    async fn db(&self) -> &SqlitePool {
+    fn db(&self) -> &SqlitePool {
         &self.db_pool
     }
 }
