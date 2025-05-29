@@ -77,9 +77,8 @@ async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, im
     }
 
     // Hash password
-    let phc = match hash_password(&body.password) {
-        Some(hash) => hash,
-        None => return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to hash password")),
+    let Some(phc) = hash_password(&body.password) else {
+        return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to hash password"));
     };
 
     // Insert user into database

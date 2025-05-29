@@ -59,23 +59,17 @@ async fn login(
     }
 
     // Craft response with access and refresh tokens
-    let access_token = match nomer.make_access_token(&state.hmac()) {
-        Some(token) => token,
-        None => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to create access token",
-            ));
-        }
+    let Some(access_token) = nomer.make_access_token(state.hmac()) else {
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to create access token",
+        ));
     };
-    let refresh_token = match nomer.make_refresh_token(&state.hmac()) {
-        Some(token) => token,
-        None => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to create refresh token",
-            ));
-        }
+    let Some(refresh_token) = nomer.make_refresh_token(state.hmac()) else {
+        return Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to create refresh token",
+        ));
     };
 
     Ok((access_token, refresh_token))
@@ -112,9 +106,9 @@ async fn get_nomer_by_email(
 }
 
 fn verify_password(password: &str, hash: &str) -> Option<bool> {
-    let parsed_hash = match argon2::PasswordHash::new(hash) {
-        Ok(hash) => hash,
-        Err(_) => return None, // Invalid hash format
+    let Ok(parsed_hash) = argon2::PasswordHash::new(hash) else {
+        // Invalid hash format
+        return None;
     };
     Some(
         Argon2::default()
