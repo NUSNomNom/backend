@@ -152,11 +152,8 @@ mod tests {
         assert!(hmac.verify_password(password.as_bytes(), &hashed).is_ok());
     }
 
-    #[tokio::test]
-    async fn test_create_user() {
-        let db = SqlitePool::connect_lazy("sqlite::memory:").unwrap();
-        sqlx::migrate!().run(&db).await.unwrap();
-
+    #[sqlx::test]
+    async fn test_create_user(db: SqlitePool) {
         let request = CreateRequest {
             display_name: "test_user".to_string(),
             password: "test_password".to_string(),

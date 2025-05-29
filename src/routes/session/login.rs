@@ -143,10 +143,8 @@ mod tests {
         assert_eq!(verify_password(password, invalid_hash), None);
     }
 
-    #[tokio::test]
-    async fn test_get_nomer_by_email() {
-        let db = SqlitePool::connect("sqlite::memory:").await.unwrap();
-        sqlx::migrate!().run(&db).await.unwrap();
+    #[sqlx::test]
+    async fn test_get_nomer_by_email(db: SqlitePool) {
         sqlx::query!(
             r#"INSERT INTO Nomer (
                 DisplayName,
