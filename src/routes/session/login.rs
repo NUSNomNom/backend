@@ -61,11 +61,21 @@ async fn login(
     // Craft response with access and refresh tokens
     let access_token = match nomer.make_access_token(&state.hmac()) {
         Some(token) => token,
-        None => return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to create access token")),
+        None => {
+return Err((
+StatusCode::INTERNAL_SERVER_ERROR,
+"Failed to create access token",
+            ));
+        }
     };
     let refresh_token = match nomer.make_refresh_token(&state.hmac()) {
         Some(token) => token,
-        None => return Err((StatusCode::INTERNAL_SERVER_ERROR, "Failed to create refresh token")),
+        None => {
+return Err((
+StatusCode::INTERNAL_SERVER_ERROR,
+"Failed to create refresh token",
+            ));
+        }
     };
 
     Ok((access_token, refresh_token))
