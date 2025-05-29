@@ -1,0 +1,12 @@
+{
+  "db_name": "SQLite",
+  "query": "INSERT INTO Nomer (DisplayName, Email, PasswordHash) VALUES (?, ?, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 3
+    },
+    "nullable": []
+  },
+  "hash": "d48dd68adc066d197d6ab6f6c64de7d86db3ffee42adae722c6234ecac2923d4"
+}
