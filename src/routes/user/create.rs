@@ -15,7 +15,7 @@ pub(super) async fn handle(
     Json(body): Json<CreateRequest>,
 ) -> impl IntoResponse {
     match create_user(&body, state.db()).await {
-        Ok(msg) => (StatusCode::OK, msg).into_response(),
+        Ok(msg) => (StatusCode::CREATED, msg).into_response(),
         Err(err) => err.into_response(),
     }
 }
