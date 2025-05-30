@@ -23,12 +23,14 @@ pub(super) async fn handle(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct LoginRequest {
     email: String,
     password: String,
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 struct LoginResponse {
     access_token: String,
     refresh_token: String,

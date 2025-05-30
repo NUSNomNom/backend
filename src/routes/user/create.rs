@@ -21,6 +21,7 @@ pub(super) async fn handle(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct CreateRequest {
     display_name: String,
     email: String,

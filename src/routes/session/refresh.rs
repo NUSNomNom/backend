@@ -20,11 +20,13 @@ pub(super) async fn handle(
 }
 
 #[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct RefreshRequest {
     refresh_token: String,
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub(super) struct RefreshResponse {
     access_token: String,
 }
