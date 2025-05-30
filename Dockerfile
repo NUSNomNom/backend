@@ -11,7 +11,7 @@ COPY .sqlx .sqlx
 RUN cargo build --release
 
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y libssl-dev ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libssl3 ca-certificates && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/src/backend/target/release/backend /usr/local/bin/backend
 
 EXPOSE 3000
