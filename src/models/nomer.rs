@@ -1,9 +1,13 @@
-use axum::{extract::FromRequestParts, http::{request::Parts, StatusCode}};
+use axum::{
+    extract::FromRequestParts,
+    http::{StatusCode, request::Parts},
+};
 use chrono::{NaiveDateTime, Utc};
 use hmac::Hmac;
 use jwt::{SignWithKey, VerifyWithKey};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
+use tracing::error;
 
 use crate::state::AppState;
 
@@ -31,6 +35,50 @@ impl Nomer {
     }
 }
 
+impl FromRequestParts<AppState> for Nomer {
+    type Rejection = (StatusCode, &'static str);
+
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
+        // Extract claim
+        let claim = NomerClaim::from_request_parts(parts, state).await?;
+
+        // Find user by email
+        sqlx::query_as!(
+            Nomer,
+            r#"
+            SELECT
+                Id as id,
+                DisplayName as display_name,
+                Email as email,
+                PasswordHash as password_hash,
+                CreatedAt as created_at,
+                UpdatedAt as updated_at
+            FROM Nomer
+            WHERE email = ?
+            "#,
+            claim.sub
+        )
+        .fetch_one(state.db())
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => {
+                // Nomer not found for the given email, even though the claim is valid
+                // This could happen if the user was deleted after the token was issued
+                // Log the error for debugging purposes
+                error!("Nomer not found for email: {}", claim.sub);
+                (StatusCode::UNAUTHORIZED, "Nomer not found")
+            }
+            _ => {
+                error!("Database error while fetching nomer: {:?}", e);
+                (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
+            }
+        })
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct NomerClaim {
     pub sub: String,
@@ -54,7 +102,10 @@ impl NomerClaim {
 impl FromRequestParts<AppState> for NomerClaim {
     type Rejection = (StatusCode, &'static str);
 
-    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &AppState,
+    ) -> Result<Self, Self::Rejection> {
         let Some(api_key_header) = parts.headers.get("X-Api-Key") else {
             // Missing X-Api-Key header
             return Err((StatusCode::UNAUTHORIZED, "Missing X-Api-Key header"));
@@ -69,7 +120,7 @@ impl FromRequestParts<AppState> for NomerClaim {
             // Valid X-Api-Key header, but invalid API key
             return Err((StatusCode::UNAUTHORIZED, "Invalid API key"));
         };
-        
+
         Ok(claim)
     }
 }
