@@ -88,9 +88,7 @@ async fn get_nomer_by_email(
             Id as id,
             DisplayName as display_name,
             Email as email,
-            PasswordHash as password_hash,
-            CreatedAt as created_at,
-            UpdatedAt as updated_at
+            PasswordHash as password_hash
         FROM Nomer WHERE Email = ?
         "#,
         email
