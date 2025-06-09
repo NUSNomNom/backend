@@ -4,8 +4,8 @@
 CREATE TABLE IF NOT EXISTS `Location` (
     `Id` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `Name` VARCHAR(255) NOT NULL UNIQUE,
-    `Latitude` REAL NOT NULL,
-    `Longitude` REAL NOT NULL
+    `Latitude` DECIMAL(10, 6) NOT NULL,
+    `Longitude` DECIMAL(10, 6) NOT NULL
 );
 
 -- Store table
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `Store` (
 CREATE TABLE IF NOT EXISTS `Item` (
     `Id` INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
     `Name` VARCHAR(255) NOT NULL,
-    `Price` REAL NOT NULL,
+    `Price` DECIMAL(10, 2) NOT NULL,
     `IsAvailable` BOOLEAN NOT NULL,
     `Description` VARCHAR(255) NOT NULL,
     `StoreId` INTEGER NOT NULL,
