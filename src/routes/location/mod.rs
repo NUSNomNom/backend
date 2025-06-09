@@ -1,6 +1,9 @@
-mod get_one;
 mod get_all;
-use axum::{routing::{post, put}, Router};
+mod get_one;
+use axum::{
+    Router,
+    routing::{post, put},
+};
 
 use crate::state::AppState;
 
