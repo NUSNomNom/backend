@@ -7,6 +7,7 @@ use hmac::Hmac;
 use jwt::{SignWithKey, VerifyWithKey};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
+use sqlx::Error;
 use tracing::error;
 
 use crate::state::AppState;
@@ -63,15 +64,14 @@ impl FromRequestParts<AppState> for Nomer {
         )
         .fetch_one(state.db())
         .await
-        .map_err(|e| match e {
-            sqlx::Error::RowNotFound => {
+        .map_err(|e| {
+            if let Error::RowNotFound = e {
                 // Nomer not found for the given email, even though the claim is valid
                 // This could happen if the user was deleted after the token was issued
                 // Log the error for debugging purposes
                 error!("Nomer not found for email: {}", claim.sub);
                 (StatusCode::UNAUTHORIZED, "Nomer not found")
-            }
-            _ => {
+            } else {
                 error!("Database error while fetching nomer: {:?}", e);
                 (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
             }
