@@ -1,8 +1,11 @@
+use axum::{extract::FromRequestParts, http::{request::Parts, StatusCode}};
 use chrono::{NaiveDateTime, Utc};
 use hmac::Hmac;
-use jwt::SignWithKey;
+use jwt::{SignWithKey, VerifyWithKey};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
+
+use crate::state::AppState;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Nomer {
@@ -45,5 +48,28 @@ impl NomerClaim {
             iat: now,
             acc: is_access,
         }
+    }
+}
+
+impl FromRequestParts<AppState> for NomerClaim {
+    type Rejection = (StatusCode, &'static str);
+
+    async fn from_request_parts(parts: &mut Parts, state: &AppState) -> Result<Self, Self::Rejection> {
+        let Some(api_key_header) = parts.headers.get("X-Api-Key") else {
+            // Missing X-Api-Key header
+            return Err((StatusCode::UNAUTHORIZED, "Missing X-Api-Key header"));
+        };
+
+        let Some(api_key) = api_key_header.to_str().ok() else {
+            // Invalid (encoding) X-Api-Key header
+            return Err((StatusCode::UNAUTHORIZED, "Invalid X-Api-Key header"));
+        };
+
+        let Ok(claim): Result<NomerClaim, _> = api_key.verify_with_key(state.hmac()) else {
+            // Valid X-Api-Key header, but invalid API key
+            return Err((StatusCode::UNAUTHORIZED, "Invalid API key"));
+        };
+        
+        Ok(claim)
     }
 }
