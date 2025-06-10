@@ -115,12 +115,31 @@ mod tests {
     }
 
     #[sqlx::test]
+    async fn test_get_location_not_found(db: MySqlPool) {
+        let loc_id = 9999; // Assuming this ID does not exist
+        let response = get_location(&db, loc_id).await;
+        assert!(response.is_err());
+        let (status, message) = response.unwrap_err();
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        assert_eq!(message, "Location not found");
+    }
+
+    #[sqlx::test]
     async fn test_get_stores(db: MySqlPool) {
         let loc_id = 1;
         let response = get_stores(&db, loc_id).await;
         assert!(response.is_ok());
         let stores = response.unwrap();
         assert!(!stores.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_stores_not_found(db: MySqlPool) {
+        let loc_id = 9999; // Assuming this ID does not exist
+        let response = get_stores(&db, loc_id).await;
+        assert!(response.is_ok());
+        let stores = response.unwrap();
+        assert!(stores.is_empty());
     }
 
     #[sqlx::test]
@@ -131,5 +150,15 @@ mod tests {
         let location_response = response.unwrap();
         assert_eq!(location_response.id, loc_id);
         assert!(!location_response.stores.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_one_location_not_found(db: MySqlPool) {
+        let loc_id = 9999; // Assuming this ID does not exist
+        let response = get_one(&db, loc_id).await;
+        assert!(response.is_err());
+        let (status, message) = response.unwrap_err();
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        assert_eq!(message, "Location not found");
     }
 }
