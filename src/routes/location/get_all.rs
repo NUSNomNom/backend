@@ -14,9 +14,7 @@ pub(super) async fn handle(State(state): State<AppState>) -> impl IntoResponse {
     }
 }
 
-async fn get_all_locations(
-    db: &MySqlPool,
-) -> Result<Vec<Location>, (StatusCode, &'static str)> {
+async fn get_all_locations(db: &MySqlPool) -> Result<Vec<Location>, (StatusCode, &'static str)> {
     sqlx::query_as!(
         Location,
         r#"SELECT
