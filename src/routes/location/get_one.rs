@@ -98,3 +98,36 @@ async fn get_one(
         stores,
     })
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[sqlx::test]
+    async fn test_get_location(db: MySqlPool) {
+        let loc_id = 1;
+        let response = get_location(&db, 1).await;
+        assert!(response.is_ok());
+        let location = response.unwrap();
+        assert_eq!(location.id, loc_id);
+    }
+
+    #[sqlx::test]
+    async fn test_get_stores(db: MySqlPool) {
+        let loc_id = 1;
+        let response = get_stores(&db, loc_id).await;
+        assert!(response.is_ok());
+        let stores = response.unwrap();
+        assert!(!stores.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_one_location(db: MySqlPool) {
+        let loc_id = 1;
+        let response = get_one(&db, loc_id).await;
+        assert!(response.is_ok());
+        let location_response = response.unwrap();
+        assert_eq!(location_response.id, loc_id);
+        assert!(!location_response.stores.is_empty());
+    }
+}
