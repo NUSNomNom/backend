@@ -47,9 +47,13 @@ async fn get_store(db: &MySqlPool, store_id: i64) -> Result<Store, (StatusCode, 
     )
     .fetch_one(db)
     .await
-    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Store not found") } else {
-        error!("Failed to fetch store: {}", e);
-        (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
+    .map_err(|e| {
+        if let Error::RowNotFound = e {
+            (StatusCode::NOT_FOUND, "Store not found")
+        } else {
+            error!("Failed to fetch store: {}", e);
+            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
+        }
     })
 }
 
