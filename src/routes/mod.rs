@@ -1,3 +1,4 @@
+mod store;
 mod location;
 mod session;
 mod user;
