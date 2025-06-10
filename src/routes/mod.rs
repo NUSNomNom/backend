@@ -1,6 +1,6 @@
-mod store;
 mod location;
 mod session;
+mod store;
 mod user;
 
 use axum::Router;
