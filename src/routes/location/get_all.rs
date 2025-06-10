@@ -1,4 +1,5 @@
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
+use sqlx::MySqlPool;
 use tracing::error;
 
 use crate::{models::Location, state::AppState};
@@ -14,7 +15,7 @@ pub(super) async fn handle(State(state): State<AppState>) -> impl IntoResponse {
 }
 
 async fn get_all_locations(
-    db: &sqlx::MySqlPool,
+    db: &MySqlPool,
 ) -> Result<Vec<Location>, (StatusCode, &'static str)> {
     sqlx::query_as!(
         Location,
@@ -31,4 +32,17 @@ async fn get_all_locations(
         error!("Failed to fetch locations: {}", e);
         (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[sqlx::test]
+    async fn test_get_all_locations(pool: MySqlPool) {
+        let locations = get_all_locations(&pool).await;
+        assert!(locations.is_ok());
+        let locations = locations.unwrap();
+        assert!(!locations.is_empty());
+    }
 }
