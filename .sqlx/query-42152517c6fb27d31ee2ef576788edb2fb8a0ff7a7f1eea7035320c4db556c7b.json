@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO Nomer (\n                DisplayName,\n                Email,\n                PasswordHash\n            ) VALUES (\n                'Test',\n                'test@test.com',\n                'test_hash'\n            )",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "42152517c6fb27d31ee2ef576788edb2fb8a0ff7a7f1eea7035320c4db556c7b"
+}

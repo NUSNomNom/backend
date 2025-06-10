@@ -5,7 +5,7 @@ use argon2::{
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use email_address::EmailAddress;
 use serde::Deserialize;
-use sqlx::SqlitePool;
+use sqlx::MySqlPool;
 use tracing::error;
 
 use crate::state::AppState;
@@ -49,7 +49,7 @@ fn hash_password(password: &str) -> Option<String> {
         .ok()
 }
 
-async fn create_user(body: &CreateRequest, db: &SqlitePool) -> Result<String, impl IntoResponse> {
+async fn create_user(body: &CreateRequest, db: &MySqlPool) -> Result<String, impl IntoResponse> {
     // Validate input
     if validate_display_name(&body.display_name)
         || validate_email(&body.email)
@@ -154,7 +154,7 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_create_user(db: SqlitePool) {
+    async fn test_create_user(db: MySqlPool) {
         let request = CreateRequest {
             display_name: "test_user".to_string(),
             password: "test_password".to_string(),

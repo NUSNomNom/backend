@@ -1,7 +1,7 @@
 use argon2::{Argon2, PasswordVerifier};
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
 use serde::{Deserialize, Serialize};
-use sqlx::SqlitePool;
+use sqlx::MySqlPool;
 use tracing::error;
 
 use crate::{models::Nomer, state::AppState};
@@ -78,7 +78,7 @@ async fn login(
 }
 
 async fn get_nomer_by_email(
-    db: &SqlitePool,
+    db: &MySqlPool,
     email: &str,
 ) -> Result<Option<Nomer>, (StatusCode, &'static str)> {
     match sqlx::query_as!(
@@ -88,9 +88,7 @@ async fn get_nomer_by_email(
             Id as id,
             DisplayName as display_name,
             Email as email,
-            PasswordHash as password_hash,
-            CreatedAt as created_at,
-            UpdatedAt as updated_at
+            PasswordHash as password_hash
         FROM Nomer WHERE Email = ?
         "#,
         email
@@ -146,16 +144,16 @@ mod tests {
     }
 
     #[sqlx::test]
-    async fn test_get_nomer_by_email(db: SqlitePool) {
+    async fn test_get_nomer_by_email(db: MySqlPool) {
         sqlx::query!(
             r#"INSERT INTO Nomer (
                 DisplayName,
                 Email,
                 PasswordHash
             ) VALUES (
-                "Test",
-                "test@test.com",
-                "test_hash"
+                'Test',
+                'test@test.com',
+                'test_hash'
             )"#
         )
         .execute(&db)

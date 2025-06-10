@@ -2,7 +2,7 @@ use axum::{
     extract::FromRequestParts,
     http::{StatusCode, request::Parts},
 };
-use chrono::{NaiveDateTime, Utc};
+use chrono::Utc;
 use hmac::Hmac;
 use jwt::{SignWithKey, VerifyWithKey};
 use serde::{Deserialize, Serialize};
@@ -18,8 +18,6 @@ pub struct Nomer {
     pub display_name: String,
     pub email: String,
     pub password_hash: String,
-    pub created_at: NaiveDateTime,
-    pub updated_at: NaiveDateTime,
 }
 
 impl Nomer {
@@ -54,9 +52,7 @@ impl FromRequestParts<AppState> for Nomer {
                 Id as id,
                 DisplayName as display_name,
                 Email as email,
-                PasswordHash as password_hash,
-                CreatedAt as created_at,
-                UpdatedAt as updated_at
+                PasswordHash as password_hash
             FROM Nomer
             WHERE email = ?
             "#,

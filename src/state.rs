@@ -1,20 +1,20 @@
 use anyhow::{Context, Result};
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
-use sqlx::{SqlitePool, sqlite::SqlitePoolOptions};
+use sqlx::{MySqlPool, mysql::MySqlPoolOptions};
 
 use crate::{config::Config, error_ctx};
 
 #[derive(Clone)]
 pub(crate) struct AppState {
-    db_pool: SqlitePool,
+    db_pool: MySqlPool,
     hmac: Hmac<Sha256>,
 }
 
 impl AppState {
     pub async fn from_config(config: &Config) -> Result<Self> {
         // Initialise database connection pool
-        let db_pool = SqlitePoolOptions::new()
+        let db_pool = MySqlPoolOptions::new()
             .connect(&config.database_url)
             .await
             .with_context(error_ctx!("Failed to connect to database"))?;
@@ -25,7 +25,7 @@ impl AppState {
         Ok(Self { db_pool, hmac })
     }
 
-    pub fn db(&self) -> &SqlitePool {
+    pub fn db(&self) -> &MySqlPool {
         &self.db_pool
     }
 
