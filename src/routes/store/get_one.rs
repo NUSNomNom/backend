@@ -47,12 +47,9 @@ async fn get_store(db: &MySqlPool, store_id: i64) -> Result<Store, (StatusCode, 
     )
     .fetch_one(db)
     .await
-    .map_err(|e| match e {
-        Error::RowNotFound => (StatusCode::NOT_FOUND, "Store not found"),
-        _ => {
-            error!("Failed to fetch store: {}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
-        }
+    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Store not found") } else {
+        error!("Failed to fetch store: {}", e);
+        (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
 }
 
@@ -71,12 +68,9 @@ async fn get_items(db: &MySqlPool, store_id: i64) -> Result<Vec<Item>, (StatusCo
     )
     .fetch_all(db)
     .await
-    .map_err(|e| match e {
-        Error::RowNotFound => (StatusCode::NOT_FOUND, "Items not found"),
-        _ => {
-            error!("Failed to fetch items: {}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
-        }
+    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Items not found") } else {
+        error!("Failed to fetch items: {}", e);
+        (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
 }
 

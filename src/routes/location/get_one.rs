@@ -18,7 +18,7 @@ pub(super) async fn handle(
     State(state): State<AppState>,
     Path(id): Path<i64>,
 ) -> impl IntoResponse {
-    match get_one(&state.db(), id).await {
+    match get_one(state.db(), id).await {
         Ok(response) => (StatusCode::OK, Json(response)).into_response(),
         Err((status, message)) => {
             error!("Error fetching location {}: {}", id, message);
@@ -50,12 +50,9 @@ async fn get_location(db: &MySqlPool, loc_id: i64) -> Result<Location, (StatusCo
     )
     .fetch_one(db)
     .await
-    .map_err(|e| match e {
-        Error::RowNotFound => (StatusCode::NOT_FOUND, "Location not found"),
-        _ => {
-            error!("Failed to fetch location: {}", e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
-        }
+    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Location not found") } else {
+        error!("Failed to fetch location: {}", e);
+        (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
 }
 
@@ -74,12 +71,9 @@ async fn get_stores(db: &MySqlPool, loc_id: i64) -> Result<Vec<Store>, (StatusCo
     )
     .fetch_all(db)
     .await
-    .map_err(|e| match e {
-        Error::RowNotFound => (StatusCode::NOT_FOUND, "Stores not found for this location"),
-        _ => {
-            error!("Failed to fetch stores for location {}: {}", loc_id, e);
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
-        }
+    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Stores not found for this location") } else {
+        error!("Failed to fetch stores for location {}: {}", loc_id, e);
+        (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
 }
 
