@@ -68,7 +68,7 @@ async fn get_items(db: &MySqlPool, store_id: i64) -> Result<Vec<Item>, (StatusCo
     )
     .fetch_all(db)
     .await
-    .map_err(|e| if let Error::RowNotFound = e { (StatusCode::NOT_FOUND, "Items not found") } else {
+    .map_err(|e| {
         error!("Failed to fetch items: {}", e);
         (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
     })
@@ -88,4 +88,79 @@ async fn get_one_store(
         cuisine: store.cuisine,
         items,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[sqlx::test]
+    async fn test_get_items(db: MySqlPool) {
+        let store_id = 1;
+
+        let response = get_items(&db, store_id).await;
+        assert!(response.is_ok());
+
+        let items = response.unwrap();
+        assert!(!items.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_items_not_found(db: MySqlPool) {
+        let store_id = 9999; // Assuming this ID does not exist
+
+        let response = get_items(&db, store_id).await;
+        assert!(response.is_ok());
+
+        let items = response.unwrap();
+        assert!(items.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_store(db: MySqlPool) {
+        let store_id = 1;
+
+        let response = get_store(&db, store_id).await;
+        assert!(response.is_ok());
+
+        let store = response.unwrap();
+        assert_eq!(store.id, store_id);
+        assert!(!store.name.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_store_not_found(db: MySqlPool) {
+        let store_id = 9999; // Assuming this ID does not exist
+
+        let response = get_store(&db, store_id).await;
+        assert!(response.is_err());
+
+        let (status, message) = response.unwrap_err();
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        assert_eq!(message, "Store not found");
+    }
+
+    #[sqlx::test]
+    async fn test_get_one_store(db: MySqlPool) {
+        let store_id = 1;
+
+        let response = get_one_store(&db, store_id).await;
+        assert!(response.is_ok());
+
+        let store_response = response.unwrap();
+        assert_eq!(store_response.id, store_id);
+        assert!(!store_response.items.is_empty());
+    }
+
+    #[sqlx::test]
+    async fn test_get_one_store_not_found(db: MySqlPool) {
+        let store_id = 9999; // Assuming this ID does not exist
+
+        let response = get_one_store(&db, store_id).await;
+        assert!(response.is_err());
+
+        let (status, message) = response.unwrap_err();
+        assert_eq!(status, StatusCode::NOT_FOUND);
+        assert_eq!(message, "Store not found");
+    }
 }
