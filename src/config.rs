@@ -11,9 +11,8 @@ pub(crate) struct Config {
     pub(super) database_url: String,
 
     /// The port to listen on.
-    /// Set by the PORT environment variable.
-    /// If not set, defaults to 3000.
-    #[arg(env = "PORT", default_value_t = 3000)]
+    /// Set by the `PORT` environment variable.
+    #[arg(env = "PORT", required = true)]
     pub(super) port: u16,
 
     /// The Base64-encoded secret key used for HMAC.
