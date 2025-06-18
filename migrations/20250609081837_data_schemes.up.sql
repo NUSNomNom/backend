@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `Store` (
     `Name` VARCHAR(255) NOT NULL UNIQUE,
     `IsOpen` BOOLEAN NOT NULL,
     `Cuisine` VARCHAR(255) NOT NULL,
-    `Description` VARCHAR(255) NOT NULL,
+    `Information` VARCHAR(255) NOT NULL,
     `LocationId` INTEGER NOT NULL,
     FOREIGN KEY (`LocationId`) REFERENCES `Location`(`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `Item` (
     `Name` VARCHAR(255) NOT NULL,
     `Price` DECIMAL(10, 2) NOT NULL,
     `IsAvailable` BOOLEAN NOT NULL,
-    `Description` VARCHAR(255) NOT NULL,
+    `Information` VARCHAR(255) NOT NULL,
     `StoreId` INTEGER NOT NULL,
     FOREIGN KEY (`StoreId`) REFERENCES `Store`(`Id`) ON DELETE CASCADE ON UPDATE CASCADE
 );
