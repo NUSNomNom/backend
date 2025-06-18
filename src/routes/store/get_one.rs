@@ -40,7 +40,7 @@ async fn get_store(db: &MySqlPool, store_id: i64) -> Result<Store, (StatusCode, 
             Name as name,
             IsOpen as `is_open: bool`,
             Cuisine as cuisine,
-            Description as description
+            Information as information
         FROM Store
         WHERE Id = ?"#,
         store_id
@@ -65,7 +65,7 @@ async fn get_items(db: &MySqlPool, store_id: i64) -> Result<Vec<Item>, (StatusCo
             Name as name,
             Price as price,
             IsAvailable as `is_available: bool`,
-            Description as description
+            Information as information
         FROM Item
         WHERE StoreId = ?"#,
         store_id

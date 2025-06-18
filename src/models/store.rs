@@ -6,5 +6,5 @@ pub struct Store {
     pub name: String,
     pub is_open: bool,
     pub cuisine: String,
-    pub description: String,
+    pub information: String,
 }

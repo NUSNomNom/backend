@@ -68,7 +68,7 @@ async fn get_stores(db: &MySqlPool, loc_id: i64) -> Result<Vec<Store>, (StatusCo
             Name as name,
             IsOpen as `is_open: bool`,
             Cuisine as cuisine,
-            Description as description
+            Information as information
         FROM Store
         WHERE LocationId = ?"#,
         loc_id
