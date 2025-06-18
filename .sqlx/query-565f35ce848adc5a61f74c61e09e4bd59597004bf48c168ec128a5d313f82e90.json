@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            Id as id,\n            Name as name,\n            IsOpen as `is_open: bool`,\n            Cuisine as cuisine,\n            Description as description\n        FROM Store\n        WHERE LocationId = ?",
+  "query": "SELECT\n            Id as id,\n            Name as name,\n            Price as price,\n            IsAvailable as `is_available: bool`,\n            Information as information\n        FROM Item\n        WHERE StoreId = ?",
   "describe": {
     "columns": [
       {
@@ -17,13 +17,22 @@
         "name": "name",
         "type_info": {
           "type": "VarString",
-          "flags": "NOT_NULL | UNIQUE_KEY | NO_DEFAULT_VALUE",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
           "max_size": 1020
         }
       },
       {
         "ordinal": 2,
-        "name": "is_open: bool",
+        "name": "price",
+        "type_info": {
+          "type": "NewDecimal",
+          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
+          "max_size": 12
+        }
+      },
+      {
+        "ordinal": 3,
+        "name": "is_available: bool",
         "type_info": {
           "type": "Tiny",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
@@ -31,17 +40,8 @@
         }
       },
       {
-        "ordinal": 3,
-        "name": "cuisine",
-        "type_info": {
-          "type": "VarString",
-          "flags": "NOT_NULL | NO_DEFAULT_VALUE",
-          "max_size": 1020
-        }
-      },
-      {
         "ordinal": 4,
-        "name": "description",
+        "name": "information",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "d7e3b8cfe4b5ec95c1be7d2cae2015fb683e94b5407de9906c081279797fe493"
+  "hash": "565f35ce848adc5a61f74c61e09e4bd59597004bf48c168ec128a5d313f82e90"
 }

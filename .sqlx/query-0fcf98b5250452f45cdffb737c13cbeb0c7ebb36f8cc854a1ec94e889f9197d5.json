@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            Id as id,\n            Name as name,\n            IsOpen as `is_open: bool`,\n            Cuisine as cuisine,\n            Description as description\n        FROM Store\n        WHERE Id = ?",
+  "query": "SELECT\n            Id as id,\n            Name as name,\n            IsOpen as `is_open: bool`,\n            Cuisine as cuisine,\n            Information as information\n        FROM Store\n        WHERE Id = ?",
   "describe": {
     "columns": [
       {
@@ -41,7 +41,7 @@
       },
       {
         "ordinal": 4,
-        "name": "description",
+        "name": "information",
         "type_info": {
           "type": "VarString",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
@@ -60,5 +60,5 @@
       false
     ]
   },
-  "hash": "ea87c75af75d8cf4b7d0119473e26da30343c3e77b90cdb404088343b10cac62"
+  "hash": "0fcf98b5250452f45cdffb737c13cbeb0c7ebb36f8cc854a1ec94e889f9197d5"
 }
