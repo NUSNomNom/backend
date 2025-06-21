@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::models::Item;
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Store {
     pub id: i64,
@@ -7,4 +9,5 @@ pub struct Store {
     pub is_open: bool,
     pub cuisine: String,
     pub information: String,
+    pub items: Vec<Item>,
 }
