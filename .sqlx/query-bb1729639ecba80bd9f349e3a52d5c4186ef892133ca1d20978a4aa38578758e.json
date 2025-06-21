@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            Id as id,\n            Name as name,\n            IsOpen as `is_open: bool`,\n            Cuisine as cuisine,\n            Information as information\n        FROM Store\n        WHERE Id = ?",
+  "query": "\n        SELECT\n            Id as id,\n            Name as name,\n            IsOpen as `is_open: bool`,\n            Cuisine as cuisine,\n            Information as information,\n            LocationId as location_id\n        FROM Store\n        ORDER BY id\n        ",
   "describe": {
     "columns": [
       {
@@ -47,12 +47,22 @@
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
           "max_size": 1020
         }
+      },
+      {
+        "ordinal": 5,
+        "name": "location_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 11
+        }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 0
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -60,5 +70,5 @@
       false
     ]
   },
-  "hash": "0fcf98b5250452f45cdffb737c13cbeb0c7ebb36f8cc854a1ec94e889f9197d5"
+  "hash": "bb1729639ecba80bd9f349e3a52d5c4186ef892133ca1d20978a4aa38578758e"
 }

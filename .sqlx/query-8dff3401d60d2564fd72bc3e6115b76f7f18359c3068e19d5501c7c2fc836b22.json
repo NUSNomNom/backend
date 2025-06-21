@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            Id as id,\n            Name as name,\n            Longitude as longitude,\n            Latitude as latitude\n        FROM Location",
+  "query": "\n        SELECT\n            Id as id,\n            Name as name,\n            Latitude as latitude,\n            Longitude as longitude\n        FROM Location\n        ORDER BY id\n        ",
   "describe": {
     "columns": [
       {
@@ -23,7 +23,7 @@
       },
       {
         "ordinal": 2,
-        "name": "longitude",
+        "name": "latitude",
         "type_info": {
           "type": "NewDecimal",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
@@ -32,7 +32,7 @@
       },
       {
         "ordinal": 3,
-        "name": "latitude",
+        "name": "longitude",
         "type_info": {
           "type": "NewDecimal",
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
@@ -50,5 +50,5 @@
       false
     ]
   },
-  "hash": "636a05656d018d9246400e3d628ec8bbf947a0fa70ac483df3bc7a18c7cf7e4c"
+  "hash": "8dff3401d60d2564fd72bc3e6115b76f7f18359c3068e19d5501c7c2fc836b22"
 }

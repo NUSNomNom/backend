@@ -1,6 +1,6 @@
 {
   "db_name": "MySQL",
-  "query": "SELECT\n            Id as id,\n            Name as name,\n            Price as price,\n            IsAvailable as `is_available: bool`,\n            Information as information\n        FROM Item\n        WHERE StoreId = ?",
+  "query": "\n        SELECT\n            Id as id,\n            Name as name,\n            Price as price,\n            IsAvailable as `is_available: bool`,\n            Information as information,\n            StoreId as store_id\n        FROM Item\n        ORDER BY id\n        ",
   "describe": {
     "columns": [
       {
@@ -47,12 +47,22 @@
           "flags": "NOT_NULL | NO_DEFAULT_VALUE",
           "max_size": 1020
         }
+      },
+      {
+        "ordinal": 5,
+        "name": "store_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | MULTIPLE_KEY | NO_DEFAULT_VALUE",
+          "max_size": 11
+        }
       }
     ],
     "parameters": {
-      "Right": 1
+      "Right": 0
     },
     "nullable": [
+      false,
       false,
       false,
       false,
@@ -60,5 +70,5 @@
       false
     ]
   },
-  "hash": "565f35ce848adc5a61f74c61e09e4bd59597004bf48c168ec128a5d313f82e90"
+  "hash": "2052936b2660be99c23b36f4dde83cbcb9b07206a70017db96821a305634258e"
 }
