@@ -13,6 +13,8 @@ jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
     steps:
       - name: Checkout code
@@ -38,8 +40,6 @@ jobs:
 
       - name: Build project
         run: cargo build --quiet --locked
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Check formatting
         run: cargo fmt --quiet --check
@@ -49,5 +49,3 @@ jobs:
       
       - name: Run tests
         run: cargo test --quiet --locked --all-targets --all-features
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}

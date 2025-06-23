@@ -7,5 +7,5 @@ pub struct Item {
     pub name: String,
     pub price: BigDecimal,
     pub is_available: bool,
-    pub description: String,
+    pub information: String,
 }
