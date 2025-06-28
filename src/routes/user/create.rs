@@ -60,7 +60,7 @@ async fn create_user(body: &CreateRequest, db: &MySqlPool) -> Result<String, imp
 
     // Check display name and email uniqueness
     let display_name_exists = match sqlx::query!(
-        "SELECT COUNT(*) AS count FROM Nomer WHERE DisplayName = ? OR Email = ?",
+        "SELECT COUNT(*) AS count FROM nomer WHERE display_name = ? OR email = ?",
         body.display_name,
         body.email
     )
@@ -84,7 +84,7 @@ async fn create_user(body: &CreateRequest, db: &MySqlPool) -> Result<String, imp
 
     // Insert user into database
     match sqlx::query!(
-        "INSERT INTO Nomer (DisplayName, Email, PasswordHash) VALUES (?, ?, ?)",
+        "INSERT INTO nomer (display_name, email, password_hash) VALUES (?, ?, ?)",
         body.display_name,
         body.email,
         phc

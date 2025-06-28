@@ -9,5 +9,6 @@ pub struct Store {
     pub is_open: bool,
     pub cuisine: String,
     pub information: String,
+    pub image_url: String,
     pub items: Vec<Item>,
 }
