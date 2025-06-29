@@ -85,11 +85,11 @@ async fn get_nomer_by_email(
         Nomer,
         r#"
         SELECT
-            Id as id,
-            DisplayName as display_name,
-            Email as email,
-            PasswordHash as password_hash
-        FROM Nomer WHERE Email = ?
+            nomer_id as id,
+            display_name,
+            email,
+            password_hash
+        FROM nomer WHERE email = ?
         "#,
         email
     )
@@ -146,10 +146,10 @@ mod tests {
     #[sqlx::test]
     async fn test_get_nomer_by_email(db: MySqlPool) {
         sqlx::query!(
-            r#"INSERT INTO Nomer (
-                DisplayName,
-                Email,
-                PasswordHash
+            r#"INSERT INTO nomer (
+                display_name,
+                email,
+                password_hash
             ) VALUES (
                 'Test',
                 'test@test.com',

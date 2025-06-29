@@ -8,4 +8,5 @@ pub struct Item {
     pub price: BigDecimal,
     pub is_available: bool,
     pub information: String,
+    pub image_url: String,
 }

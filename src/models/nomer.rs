@@ -49,11 +49,11 @@ impl FromRequestParts<AppState> for Nomer {
             Nomer,
             r#"
             SELECT
-                Id as id,
-                DisplayName as display_name,
-                Email as email,
-                PasswordHash as password_hash
-            FROM Nomer
+                nomer_id as id,
+                display_name,
+                email,
+                password_hash
+            FROM nomer
             WHERE email = ?
             "#,
             claim.sub
