@@ -1,6 +1,7 @@
 mod canteen;
 mod item;
 mod nomer;
+mod review;
 mod store;
 
 pub use canteen::Canteen;
