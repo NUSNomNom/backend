@@ -1,3 +1,4 @@
+mod review;
 mod data;
 mod session;
 mod user;
@@ -11,4 +12,5 @@ pub(super) fn make_router() -> Router<AppState> {
         .nest("/user", user::make_router())
         .nest("/session", session::make_router())
         .nest("/data", data::make_router())
+        .nest("/review", review::make_router())
 }
