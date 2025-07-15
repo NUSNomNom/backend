@@ -13,8 +13,9 @@ jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
     runs-on: ubuntu-latest
+
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: mysql://root:root@localhost:3306/test_db
 
     steps:
       - name: Checkout code
@@ -26,6 +27,19 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           override: true
+
+      - name: Start MySQL service
+        run: |
+          sudo systemctl start mysql.service
+          sudo mysqladmin ping --wait=30
+          sudo mysql --user=root --password=root -e "CREATE DATABASE test_db;"
+
+      - name: Run database migrations
+        run: |
+          for migration in $(ls migrations/*.sql | sort); do
+            echo "Running migration: $migration"
+            sudo mysql --user=root --password=root test_db < "$migration"
+          done
       
       - name: Cache Cargo registry
         uses: actions/cache@v4.2.3
