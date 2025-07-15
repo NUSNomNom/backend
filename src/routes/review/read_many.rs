@@ -44,14 +44,11 @@ async fn read_many_reviews(
         (None, None) => fetch_all_reviews(db, limit, offset).await,
     }?;
 
-    Ok(db_reviews
-        .into_iter()
-        .map(|db_review| db_review.into())
-        .collect())
+    Ok(db_reviews.into_iter().map(Into::into).collect())
 }
 
 fn validate_limit(limit: Option<i64>) -> i64 {
-    limit.unwrap_or(50).min(100).max(1)
+    limit.unwrap_or(50).clamp(1, 100)
 }
 
 async fn fetch_reviews_with_both_filters(
