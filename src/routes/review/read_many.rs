@@ -39,18 +39,15 @@ async fn read_many_reviews(
         (Some(nomer_id), Some(store_id)) => {
             fetch_reviews_with_both_filters(db, nomer_id, store_id, limit, offset).await
         }
-        (Some(nomer_id), None) => {
-            fetch_reviews_by_nomer(db, nomer_id, limit, offset).await
-        }
-        (None, Some(store_id)) => {
-            fetch_reviews_by_store(db, store_id, limit, offset).await
-        }
-        (None, None) => {
-            fetch_all_reviews(db, limit, offset).await
-        }
+        (Some(nomer_id), None) => fetch_reviews_by_nomer(db, nomer_id, limit, offset).await,
+        (None, Some(store_id)) => fetch_reviews_by_store(db, store_id, limit, offset).await,
+        (None, None) => fetch_all_reviews(db, limit, offset).await,
     }?;
 
-    Ok(db_reviews.into_iter().map(|db_review| db_review.into()).collect())
+    Ok(db_reviews
+        .into_iter()
+        .map(|db_review| db_review.into())
+        .collect())
 }
 
 fn validate_limit(limit: Option<i64>) -> i64 {
@@ -164,7 +161,7 @@ mod tests {
         assert_eq!(validate_limit(Some(100)), 100);
 
         assert_eq!(validate_limit(Some(150)), 100);
-        
+
         assert_eq!(validate_limit(Some(0)), 1);
         assert_eq!(validate_limit(Some(-5)), 1);
     }
@@ -182,7 +179,7 @@ mod tests {
         .unwrap();
 
         let reviews = fetch_all_reviews(&db, 10, 0).await.unwrap();
-        
+
         assert_eq!(reviews.len(), 3);
         let comments: Vec<&String> = reviews.iter().map(|r| &r.comment).collect();
         assert!(comments.contains(&&"Excellent".to_string()));
@@ -203,7 +200,7 @@ mod tests {
         .unwrap();
 
         let reviews = fetch_reviews_by_nomer(&db, 1, 10, 0).await.unwrap();
-        
+
         assert_eq!(reviews.len(), 2);
         assert_eq!(reviews[0].nomer_id, 1);
         assert_eq!(reviews[1].nomer_id, 1);
@@ -222,7 +219,7 @@ mod tests {
         .unwrap();
 
         let reviews = fetch_reviews_by_store(&db, 1, 10, 0).await.unwrap();
-        
+
         assert_eq!(reviews.len(), 2);
         assert_eq!(reviews[0].store_id, 1);
         assert_eq!(reviews[1].store_id, 1);
@@ -241,8 +238,10 @@ mod tests {
         .await
         .unwrap();
 
-        let reviews = fetch_reviews_with_both_filters(&db, 1, 1, 10, 0).await.unwrap();
-        
+        let reviews = fetch_reviews_with_both_filters(&db, 1, 1, 10, 0)
+            .await
+            .unwrap();
+
         assert_eq!(reviews.len(), 1);
         assert_eq!(reviews[0].nomer_id, 1);
         assert_eq!(reviews[0].store_id, 1);
