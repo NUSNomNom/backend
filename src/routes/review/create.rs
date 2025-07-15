@@ -110,6 +110,7 @@ async fn insert_review(
     })?;
 
     // Get the ID of the inserted review from the execute result
+    #[allow(clippy::cast_possible_wrap)]
     let review_id = result.last_insert_id() as i64;
 
     if review_id == 0 {
@@ -342,7 +343,7 @@ mod tests {
         assert_eq!(status, StatusCode::BAD_REQUEST);
 
         // Test empty comment
-        let result = create_review(&db, 1, 1, 4, "".to_string()).await;
+        let result = create_review(&db, 1, 1, 4, String::new()).await;
         assert!(result.is_err());
         let (status, _) = result.unwrap_err();
         assert_eq!(status, StatusCode::BAD_REQUEST);

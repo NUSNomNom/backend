@@ -56,7 +56,7 @@ async fn verify_review_ownership(
 
     match result {
         Some(row) => {
-            if row.nomer_id as i64 == nomer_id {
+            if i64::from(row.nomer_id) == nomer_id {
                 Ok(())
             } else {
                 Err((
@@ -108,12 +108,13 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id =
+        let review_id = i64::from(
             sqlx::query!("SELECT review_id FROM review WHERE comment = 'Test ownership' LIMIT 1")
                 .fetch_one(&db)
                 .await
                 .unwrap()
-                .review_id as i64;
+                .review_id,
+        );
 
         let result = verify_review_ownership(&db, 1, review_id).await;
         assert!(result.is_ok());
@@ -132,12 +133,13 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id =
+        let review_id = i64::from(
             sqlx::query!("SELECT review_id FROM review WHERE comment = 'User 1 review' LIMIT 1")
                 .fetch_one(&db)
                 .await
                 .unwrap()
-                .review_id as i64;
+                .review_id,
+        );
 
         // Try to verify ownership with a different user (user 2)
         let result = verify_review_ownership(&db, 2, review_id).await;
@@ -173,12 +175,13 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id =
+        let review_id = i64::from(
             sqlx::query!("SELECT review_id FROM review WHERE comment = 'To be deleted' LIMIT 1")
                 .fetch_one(&db)
                 .await
                 .unwrap()
-                .review_id as i64;
+                .review_id,
+        );
 
         let result = delete_review_by_id(&db, review_id).await;
         assert!(result.is_ok());
@@ -221,12 +224,13 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id =
+        let review_id = i64::from(
             sqlx::query!("SELECT review_id FROM review WHERE comment = 'Remove test' LIMIT 1")
                 .fetch_one(&db)
                 .await
                 .unwrap()
-                .review_id as i64;
+                .review_id,
+        );
 
         let result = remove_review(&db, 1, review_id).await;
         assert!(result.is_ok());
@@ -269,13 +273,15 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'User 1 forbidden test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id = i64::from(
+            sqlx::query!(
+                "SELECT review_id FROM review WHERE comment = 'User 1 forbidden test' LIMIT 1"
+            )
+            .fetch_one(&db)
+            .await
+            .unwrap()
+            .review_id,
+        );
 
         // Try to remove as user 2
         let result = remove_review(&db, 2, review_id).await;
@@ -311,21 +317,25 @@ mod tests {
         .await
         .unwrap();
 
-        let user1_review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'User 1 multi test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let user1_review_id = i64::from(
+            sqlx::query!(
+                "SELECT review_id FROM review WHERE comment = 'User 1 multi test' LIMIT 1"
+            )
+            .fetch_one(&db)
+            .await
+            .unwrap()
+            .review_id,
+        );
 
-        let user2_review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'User 2 multi test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let user2_review_id = i64::from(
+            sqlx::query!(
+                "SELECT review_id FROM review WHERE comment = 'User 2 multi test' LIMIT 1"
+            )
+            .fetch_one(&db)
+            .await
+            .unwrap()
+            .review_id,
+        );
 
         // User 1 can delete their own review
         let result = remove_review(&db, 1, user1_review_id).await;
@@ -391,13 +401,15 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Double delete test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id = i64::from(
+            sqlx::query!(
+                "SELECT review_id FROM review WHERE comment = 'Double delete test' LIMIT 1"
+            )
+            .fetch_one(&db)
+            .await
+            .unwrap()
+            .review_id,
+        );
 
         // First deletion should succeed
         let result = remove_review(&db, 1, review_id).await;
