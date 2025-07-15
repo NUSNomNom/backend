@@ -13,8 +13,25 @@ jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
     runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: test_password
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: test_password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: mysql://test_user:test_password@localhost:3306/test_db
 
     steps:
       - name: Checkout code
@@ -26,6 +43,14 @@ jobs:
           toolchain: stable
           components: rustfmt, clippy
           override: true
+
+      - name: Wait for MySQL to be ready
+        run: |
+          until mysqladmin ping -h localhost -P 3306 -u test_user -ptest_password --silent; do
+            echo 'Waiting for MySQL...'
+            sleep 2
+          done
+          echo 'MySQL is ready!'
       
       - name: Cache Cargo registry
         uses: actions/cache@v4.2.3
