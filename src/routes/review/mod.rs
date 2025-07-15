@@ -28,3 +28,29 @@ struct DbReview {
     store_id: i64,
     created_at: DateTime<Utc>,
 }
+
+impl From<DbReview> for crate::models::Review {
+    fn from(db_review: DbReview) -> Self {
+        Self {
+            id: db_review.review_id,
+            store_id: db_review.store_id,
+            nomer_id: db_review.nomer_id,
+            score: db_review.score,
+            comment: db_review.comment,
+            created_at: db_review.created_at,
+        }
+    }
+}
+
+impl From<crate::models::Review> for DbReview {
+    fn from(review: crate::models::Review) -> Self {
+        Self {
+            review_id: review.id,
+            store_id: review.store_id,
+            nomer_id: review.nomer_id,
+            score: review.score,
+            comment: review.comment,
+            created_at: review.created_at,
+        }
+    }
+}
