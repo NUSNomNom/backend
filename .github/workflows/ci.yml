@@ -31,14 +31,11 @@ jobs:
       - name: Start MySQL service
         run: |
           sudo systemctl start mysql.service
-          # Wait for MySQL to be ready
           sudo mysqladmin ping --wait=30
-          # Create test database
           sudo mysql --user=root --password=root -e "CREATE DATABASE test_db;"
 
       - name: Run database migrations
         run: |
-          # Run migrations in chronological order based on filename timestamps
           for migration in $(ls migrations/*.sql | sort); do
             echo "Running migration: $migration"
             sudo mysql --user=root --password=root test_db < "$migration"
