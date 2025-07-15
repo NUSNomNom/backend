@@ -13,22 +13,6 @@ jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
     runs-on: ubuntu-latest
-    
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: test_password
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: test_user
-          MYSQL_PASSWORD: test_password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping --silent"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     env:
       DATABASE_URL: mysql://test_user:test_password@localhost:3306/test_db
@@ -44,13 +28,13 @@ jobs:
           components: rustfmt, clippy
           override: true
 
-      - name: Wait for MySQL to be ready
+      - name: Start MySQL service
         run: |
-          until mysqladmin ping -h localhost -P 3306 -u test_user -ptest_password --silent; do
-            echo 'Waiting for MySQL...'
-            sleep 2
-          done
-          echo 'MySQL is ready!'
+          sudo systemctl start mysql.service
+          sudo mysql -e "CREATE DATABASE test_db;"
+          sudo mysql -e "CREATE USER 'test_user'@'localhost' IDENTIFIED BY 'test_password';"
+          sudo mysql -e "GRANT ALL PRIVILEGES ON test_db.* TO 'test_user'@'localhost';"
+          sudo mysql -e "FLUSH PRIVILEGES;"
       
       - name: Cache Cargo registry
         uses: actions/cache@v4.2.3
