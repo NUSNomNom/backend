@@ -25,10 +25,10 @@ async fn remove_review(
 ) -> Result<(), (StatusCode, &'static str)> {
     // First verify the review exists and belongs to the user
     verify_review_ownership(db, nomer_id, review_id).await?;
-    
+
     // Delete the review
     delete_review_by_id(db, review_id).await?;
-    
+
     Ok(())
 }
 
@@ -47,14 +47,22 @@ async fn verify_review_ownership(
     )
     .fetch_optional(db)
     .await
-    .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to verify review ownership"))?;
+    .map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to verify review ownership",
+        )
+    })?;
 
     match result {
         Some(row) => {
             if row.nomer_id as i64 == nomer_id {
                 Ok(())
             } else {
-                Err((StatusCode::FORBIDDEN, "You can only delete your own reviews"))
+                Err((
+                    StatusCode::FORBIDDEN,
+                    "You can only delete your own reviews",
+                ))
             }
         }
         None => Err((StatusCode::NOT_FOUND, "Review not found")),
@@ -100,13 +108,12 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Test ownership' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Test ownership' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let result = verify_review_ownership(&db, 1, review_id).await;
         assert!(result.is_ok());
@@ -125,13 +132,12 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'User 1 review' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'User 1 review' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         // Try to verify ownership with a different user (user 2)
         let result = verify_review_ownership(&db, 2, review_id).await;
@@ -167,13 +173,12 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'To be deleted' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'To be deleted' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let result = delete_review_by_id(&db, review_id).await;
         assert!(result.is_ok());
@@ -216,13 +221,12 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Remove test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Remove test' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let result = remove_review(&db, 1, review_id).await;
         assert!(result.is_ok());

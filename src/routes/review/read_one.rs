@@ -68,13 +68,12 @@ mod tests {
         .unwrap();
 
         // Find the review by its unique content
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Test review' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Test review' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let result = fetch_review_by_id(&db, review_id).await;
         assert!(result.is_ok());
@@ -148,7 +147,7 @@ mod tests {
 
         // Insert multiple reviews and collect their IDs
         let mut review_data = Vec::new();
-        
+
         for i in 1..=3 {
             let comment = format!("Review {}", i);
             sqlx::query!(
@@ -171,7 +170,7 @@ mod tests {
             .await
             .unwrap()
             .review_id as i64;
-            
+
             review_data.push((review_id, i, comment));
         }
 
@@ -191,7 +190,7 @@ mod tests {
         setup_test_data(&db).await;
 
         let special_comment = "Review with special chars: !@#$%^&*()_+{}|:<>?[]\\;',./";
-        
+
         sqlx::query!(
             r#"INSERT INTO review (store_id, nomer_id, score, comment) 
                VALUES (1, 1, 3, ?)"#,
@@ -219,7 +218,7 @@ mod tests {
         setup_test_data(&db).await;
 
         let unicode_comment = "Unicode review: 你好世界 🍜 مرحبا بالعالم 🌍";
-        
+
         sqlx::query!(
             r#"INSERT INTO review (store_id, nomer_id, score, comment) 
                VALUES (1, 1, 5, ?)"#,
@@ -255,13 +254,12 @@ mod tests {
         .await
         .unwrap();
 
-        let min_review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Minimum score' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let min_review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Minimum score' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let min_review = read_one_review(&db, min_review_id).await.unwrap();
         assert_eq!(min_review.score, 1);
@@ -275,13 +273,12 @@ mod tests {
         .await
         .unwrap();
 
-        let max_review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Maximum score' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let max_review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Maximum score' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let max_review = read_one_review(&db, max_review_id).await.unwrap();
         assert_eq!(max_review.score, 5);
@@ -299,13 +296,12 @@ mod tests {
         .await
         .unwrap();
 
-        let review_id = sqlx::query!(
-            "SELECT review_id FROM review WHERE comment = 'Conversion test' LIMIT 1"
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap()
-        .review_id as i64;
+        let review_id =
+            sqlx::query!("SELECT review_id FROM review WHERE comment = 'Conversion test' LIMIT 1")
+                .fetch_one(&db)
+                .await
+                .unwrap()
+                .review_id as i64;
 
         let db_review = fetch_review_by_id(&db, review_id).await.unwrap();
         let review: Review = db_review.into();

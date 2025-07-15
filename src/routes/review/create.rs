@@ -44,10 +44,10 @@ async fn create_review(
     comment: String,
 ) -> Result<Review, (StatusCode, &'static str)> {
     validate_review_input(store_id, nomer_id, score, &comment)?;
-    
+
     let review_id = insert_review(db, store_id, nomer_id, score, comment).await?;
     let db_review = fetch_created_review(db, review_id).await?;
-    
+
     Ok(db_review.into())
 }
 
@@ -60,23 +60,23 @@ fn validate_review_input(
     if store_id <= 0 {
         return Err((StatusCode::BAD_REQUEST, "Invalid store ID"));
     }
-    
+
     if nomer_id <= 0 {
         return Err((StatusCode::BAD_REQUEST, "Invalid user ID"));
     }
-    
+
     if !(1..=5).contains(&score) {
         return Err((StatusCode::BAD_REQUEST, "Score must be between 1 and 5"));
     }
-    
+
     if comment.is_empty() {
         return Err((StatusCode::BAD_REQUEST, "Comment cannot be empty"));
     }
-    
+
     if comment.len() > 255 {
         return Err((StatusCode::BAD_REQUEST, "Comment too long"));
     }
-    
+
     Ok(())
 }
 
@@ -102,13 +102,11 @@ async fn insert_review(
     )
     .execute(db)
     .await
-    .map_err(|e| {
-        match e {
-            sqlx::Error::Database(db_err) if db_err.is_foreign_key_violation() => {
-                (StatusCode::BAD_REQUEST, "Invalid store or user ID")
-            }
-            _ => (StatusCode::INTERNAL_SERVER_ERROR, "Failed to create review")
+    .map_err(|e| match e {
+        sqlx::Error::Database(db_err) if db_err.is_foreign_key_violation() => {
+            (StatusCode::BAD_REQUEST, "Invalid store or user ID")
         }
+        _ => (StatusCode::INTERNAL_SERVER_ERROR, "Failed to create review"),
     })?;
 
     // Get the ID of the inserted review from the execute result
@@ -136,7 +134,12 @@ async fn fetch_created_review(
     )
     .fetch_one(db)
     .await
-    .map_err(|_| (StatusCode::INTERNAL_SERVER_ERROR, "Failed to fetch created review"))
+    .map_err(|_| {
+        (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to fetch created review",
+        )
+    })
 }
 
 #[cfg(test)]
@@ -224,7 +227,7 @@ mod tests {
         // Test valid boundary values
         assert!(validate_review_input(1, 1, 1, "x").is_ok());
         assert!(validate_review_input(1, 1, 5, "x").is_ok());
-        
+
         let max_length_comment = "a".repeat(255);
         assert!(validate_review_input(1, 1, 3, &max_length_comment).is_ok());
     }
@@ -240,13 +243,10 @@ mod tests {
         assert!(review_id > 0);
 
         // Verify the review was actually inserted
-        let review = sqlx::query!(
-            "SELECT * FROM review WHERE review_id = ?",
-            review_id
-        )
-        .fetch_one(&db)
-        .await
-        .unwrap();
+        let review = sqlx::query!("SELECT * FROM review WHERE review_id = ?", review_id)
+            .fetch_one(&db)
+            .await
+            .unwrap();
 
         assert_eq!(review.store_id, 1);
         assert_eq!(review.nomer_id, 1);
@@ -278,7 +278,9 @@ mod tests {
         setup_test_data(&db).await;
 
         // First insert a review
-        let review_id = insert_review(&db, 1, 1, 5, "Excellent!".to_string()).await.unwrap();
+        let review_id = insert_review(&db, 1, 1, 5, "Excellent!".to_string())
+            .await
+            .unwrap();
 
         // Then fetch it
         let result = fetch_created_review(&db, review_id).await;
@@ -430,7 +432,7 @@ mod tests {
 
         assert!(result.is_ok());
         let review = result.unwrap();
-        
+
         // The created_at timestamp should be within a reasonable range
         // Database CURRENT_TIMESTAMP might be slightly different from our timestamps
         let one_minute_ago = before_creation - chrono::Duration::minutes(1);
