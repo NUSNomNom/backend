@@ -42,12 +42,5 @@ async fn read_one_review(
         }
     })?;
 
-    Ok(Review {
-        id: review.review_id,
-        store_id: review.store_id,
-        nomer_id: review.nomer_id,
-        score: review.score,
-        comment: review.comment,
-        created_at: review.created_at,
-    })
+    Ok(review.into())
 }
