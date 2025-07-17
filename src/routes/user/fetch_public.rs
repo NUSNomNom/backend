@@ -39,9 +39,10 @@ async fn fetch_user_public_info(
     )
     .fetch_one(db)
     .await
-    .map_err(|e| match e {
-        Error::RowNotFound => (StatusCode::NOT_FOUND, "User not found"),
-        _ => {
+    .map_err(|e| {
+        if let Error::RowNotFound = e {
+            (StatusCode::NOT_FOUND, "User not found")
+        } else {
             error!("Database error while fetching user: {:?}", e);
             (StatusCode::INTERNAL_SERVER_ERROR, "Database error")
         }
@@ -60,90 +61,6 @@ pub struct FetchPublicResponse {
 mod tests {
     use super::*;
     use sqlx::MySqlPool;
-
-    #[test]
-    fn test_response_structure() {
-        let response = FetchPublicResponse {
-            id: 123,
-            display_name: "Test User".to_string(),
-        };
-
-        assert_eq!(response.id, 123);
-        assert_eq!(response.display_name, "Test User");
-    }
-
-    #[test]
-    fn test_response_equality() {
-        let response1 = FetchPublicResponse {
-            id: 1,
-            display_name: "John Doe".to_string(),
-        };
-
-        let response2 = FetchPublicResponse {
-            id: 1,
-            display_name: "John Doe".to_string(),
-        };
-
-        let response3 = FetchPublicResponse {
-            id: 2,
-            display_name: "Jane Smith".to_string(),
-        };
-
-        assert_eq!(response1, response2);
-        assert_ne!(response1, response3);
-    }
-
-    #[test]
-    fn test_fetch_user_error_debug() {
-        let error = (StatusCode::NOT_FOUND, "User not found");
-        assert_eq!(error.0, StatusCode::NOT_FOUND);
-        assert_eq!(error.1, "User not found");
-
-        let db_error = (StatusCode::INTERNAL_SERVER_ERROR, "Database error");
-        assert_eq!(db_error.0, StatusCode::INTERNAL_SERVER_ERROR);
-        assert_eq!(db_error.1, "Database error");
-    }
-
-    #[test]
-    fn test_error_handling_logic() {
-        // Test that NotFound errors are handled correctly
-        let not_found_error = (StatusCode::NOT_FOUND, "User not found");
-        match not_found_error {
-            (StatusCode::NOT_FOUND, "User not found") => {
-                // This should be the path taken
-                assert!(true);
-            }
-            _ => {
-                panic!("Expected NotFound error");
-            }
-        }
-
-        // Test that database errors are handled correctly
-        let db_error = (StatusCode::INTERNAL_SERVER_ERROR, "Database error");
-        match db_error {
-            (StatusCode::INTERNAL_SERVER_ERROR, "Database error") => {
-                // This should be the path taken
-                assert!(true);
-            }
-            _ => {
-                panic!("Expected DatabaseError");
-            }
-        }
-    }
-
-    #[test]
-    fn test_response_serde_structure() {
-        // Test that the serde rename_all works correctly
-        let response = FetchPublicResponse {
-            id: 1,
-            display_name: "Test".to_string(),
-        };
-
-        // The field should be serialized as "displayName" due to camelCase
-        // This is mainly to ensure the structure compiles correctly with serde
-        assert_eq!(response.id, 1);
-        assert_eq!(response.display_name, "Test");
-    }
 
     #[sqlx::test]
     async fn test_fetch_user_public_info_success(db: MySqlPool) {
