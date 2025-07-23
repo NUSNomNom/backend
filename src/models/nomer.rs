@@ -13,6 +13,7 @@ use tracing::error;
 use crate::state::AppState;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Nomer {
     pub id: i64,
     pub display_name: String,
@@ -76,6 +77,7 @@ impl FromRequestParts<AppState> for Nomer {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NomerClaim {
     pub sub: String,
     pub exp: i64,
