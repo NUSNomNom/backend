@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use crate::models::Item;
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Store {
     pub id: i64,
     pub name: String,

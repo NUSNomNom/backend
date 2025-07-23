@@ -20,6 +20,7 @@ pub(super) fn make_router() -> Router<AppState> {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 struct DbReview {
     review_id: i64,
     score: i64,
