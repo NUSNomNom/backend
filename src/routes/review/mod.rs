@@ -15,8 +15,8 @@ pub(super) fn make_router() -> Router<AppState> {
     Router::new()
         .route("/", post(create::handle))
         .route("/", get(read_many::handle))
-        .route("/:id", get(read_one::handle))
-        .route("/:id", delete(remove::handle))
+        .route("/{id}", get(read_one::handle))
+        .route("/{id}", delete(remove::handle))
 }
 
 #[derive(Debug, Serialize, Deserialize)]
