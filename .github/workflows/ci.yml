@@ -1,14 +1,9 @@
 name: Rust CI
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - main
-      - dev
-    paths:
-      - '**/*.rs'
-      - 'Cargo.toml'
-      - 'Cargo.lock'
-
 jobs:
   rust-ci:
     name: Rust Format, Lint, and Test (Stable)
