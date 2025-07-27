@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO canteen (canteen_name, latitude, longitude, image_url) \n               VALUES ('Test Canteen', 1.0, 103.0, 'test_canteen.jpg')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "8c21631635881075030c06cc4d843c28c78b418a1b58742e5e830b231053c171"
+}

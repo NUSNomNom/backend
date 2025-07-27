@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT review_id FROM review WHERE comment = 'Another test review' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "review_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNIQUE_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "43babcc9cb6b292f614ee2d66f593c04c7f0ad7b0b31312a877df05dc1187734"
+}

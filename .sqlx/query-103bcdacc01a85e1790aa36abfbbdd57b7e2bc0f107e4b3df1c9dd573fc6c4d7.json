@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT nomer_id FROM nomer WHERE email = 'special@test.com'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "nomer_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNIQUE_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "103bcdacc01a85e1790aa36abfbbdd57b7e2bc0f107e4b3df1c9dd573fc6c4d7"
+}

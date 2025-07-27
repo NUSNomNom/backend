@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO review (store_id, nomer_id, score, comment) \n               VALUES (1, 1, 5, 'Store 1 Review 1'), (1, 2, 4, 'Store 1 Review 2'), (2, 3, 3, 'Store 2 Review')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": []
+  },
+  "hash": "8d1ad770ad319b850e496214d758716eff50427eda179e4bdcf773a93d6a0751"
+}

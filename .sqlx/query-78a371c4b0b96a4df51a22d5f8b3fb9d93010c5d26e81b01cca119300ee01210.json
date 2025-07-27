@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT review_id FROM review WHERE comment = 'Remove test' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "review_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNIQUE_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "78a371c4b0b96a4df51a22d5f8b3fb9d93010c5d26e81b01cca119300ee01210"
+}

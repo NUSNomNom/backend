@@ -31,5 +31,3 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/nusnomnom/backend:latest
-          build-args:
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
