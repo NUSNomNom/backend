@@ -1,0 +1,47 @@
+services:
+  backend:
+    # This will make sure it builds from source, since we don't publish
+    # a public image.
+    build:
+      context: .
+      args:
+        DATABASE_URL: mysql://root:root@db:3306/nomnom
+    container_name: nomnom-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # In the format of HOST_PORT:CONTAINER_PORT
+      # If you want to serve the application on another port,
+      # ONLY change the first number.
+      - 3000:3000
+    environment:
+      # MySQL database connection string
+      # Since this Docker Compose file will fire up its own database,
+      # please don't change this. Only change if you are using an external
+      # MySQL server.
+      DATABASE_URL: mysql://root:root@db:3306/nomnom
+
+      # HMAC secret
+      # This secret is used to sign JSON web tokens. To generate a new key,
+      # you can run `openssl rand -base64 32`.
+      HMAC_SECRET: PLEASE_CHANGE_ME
+  db:
+    image: mysql:8.0
+    container_name: nomnom-db
+    environment:
+      # Don't need to change anything here.
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nomnom
+    volumes:
+      - data:/var/lib/mysql
+      - ./migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  data:
+    # You can point to an external volume if you want to.
