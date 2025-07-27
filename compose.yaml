@@ -16,6 +16,13 @@ services:
       # ONLY change the first number.
       - 3000:3000
     environment:
+      # Port for the app to listen on
+      # Honestly, now that I think about it, this should be fixed inside
+      # the app itself since you can configure which host port to use.
+      # Please don't change it, or if you do for some unknown reasons,
+      # change the second number above as well.
+      PORT: 3000
+
       # MySQL database connection string
       # Since this Docker Compose file will fire up its own database,
       # please don't change this. Only change if you are using an external
