@@ -1,0 +1,24 @@
+{
+  "db_name": "MySQL",
+  "query": "SELECT review_id FROM review WHERE comment = 'Conversion test' LIMIT 1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "review_id",
+        "type_info": {
+          "type": "Long",
+          "flags": "NOT_NULL | PRIMARY_KEY | UNIQUE_KEY | AUTO_INCREMENT",
+          "max_size": 11
+        }
+      }
+    ],
+    "parameters": {
+      "Right": 0
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "d2ddf42292bd45bf068945865c5f20401c9a4078a70cda233ce430487ba76677"
+}

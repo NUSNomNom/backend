@@ -1,0 +1,12 @@
+{
+  "db_name": "MySQL",
+  "query": "INSERT INTO store (store_name, is_open, cuisine, information, canteen_id, image_url) \n                   VALUES (?, TRUE, 'Test Cuisine', 'Test Info', 1, ?)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Right": 2
+    },
+    "nullable": []
+  },
+  "hash": "7c75372ca632e8d2f0b36fed64eefe3fa1104132bf7be235b94e1e2f29b02403"
+}
